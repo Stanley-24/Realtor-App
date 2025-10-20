@@ -2,7 +2,7 @@
 
 import { Request } from 'express';
 import { Types } from 'mongoose';
-import { UserRole } from './User.types.ts';
+import { UserRole } from './User.types';
 
 // Data contained within the JWT payload after verification
 export interface IJwtPayload {

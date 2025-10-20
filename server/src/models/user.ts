@@ -2,7 +2,7 @@
 
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { IUser, UserRole } from '../types/User.types.ts'; // Assuming IUser is defined in this directory
+import { IUser, UserRole } from '../types/User.types'; // Assuming IUser is defined in this directory
 
 const UserSchema = new Schema<IUser>(
     {

@@ -1,22 +1,36 @@
 import express from "express";
 import cors from "cors";
 import config from "./config/config";
-import authRoutes from "./routes/auth.routes.ts";
+import authRoutes from "./routes/auth.routes";
+import path from "path";
 
 
 const app = express();
+
+
+
 
 // 🔧 Middleware
 app.use(express.json());
 app.use(cors());
 app.use("/api/v1/auth", authRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Welcome to the Realtor App API");
-});
+
+
+if (config.nodeEnv === "production") {
+  const clientPath = path.join(__dirname, "../../client/dist");
+
+  app.use(express.static(clientPath));
+
+  app.get("*", (_, res) => {
+    res.sendFile(path.join(clientPath, "index.html"));
+  });
+}
+
+
 
 // 🌍 Port setup
-const PORT = config.port
+const PORT = config.port;
 
 // 🚀 Start server
 app.listen(PORT, () => {
