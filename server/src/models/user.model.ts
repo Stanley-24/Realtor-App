@@ -21,7 +21,7 @@ const UserSchema = new Schema<IUser>(
     password: {
       type: String,
       required: [true, 'Please add a password'],
-      minlength: 6,
+      minlength: 8,
       select: false, // Do not return password by default on queries
     },
     role: {

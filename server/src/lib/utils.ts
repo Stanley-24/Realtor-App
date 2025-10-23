@@ -1,28 +1,29 @@
 import jwt from "jsonwebtoken";
-import config from "../config/config";
 import { Response } from "express";
+import config from "../config/config";
 
-/**
- * Generate JWT token and set it as an HTTP-only cookie.
- */
 export const generateToken = (userId: string, role: string, res: Response): string => {
   if (!config.JWT_SECRET) {
     throw new Error("JWT_SECRET is not configured");
   }
+
   if (!userId?.trim()) {
     throw new Error("userId is required");
   }
+
   if (!role?.trim()) {
     throw new Error("role is required");
   }
 
+  // Sign token
   const token = jwt.sign({ userId, role }, config.JWT_SECRET, { expiresIn: "7d" });
 
+  // Set cookie
   res.cookie("jwt", token, {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true,
     sameSite: "strict",
     secure: config.nodeEnv !== "development",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
   return token;
