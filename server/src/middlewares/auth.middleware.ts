@@ -47,7 +47,7 @@ export const protectRoutes = async (req: AuthRequest, res: Response, next: NextF
     req.user = await User.findById(decoded.id).select("-password");
 
     if (!req.user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
 
     next();

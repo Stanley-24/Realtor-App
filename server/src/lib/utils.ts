@@ -32,12 +32,18 @@ export const generateToken = (userId: string, role: string, res: Response): stri
  * Helper: Return dashboard URL for each role.
  */
 export const getDashboardUrl = (role: string): string => {
-  switch (role) {
-    case "Admin":
+  if (!role?.trim()) {
+    throw new Error("role is required");
+  }
+  
+  switch (role.toLowerCase()) {
+    case "admin":
       return "/dashboard/admin";
-    case "Agent":
+    case "agent":
       return "/dashboard/agent";
-    default:
+    case "buyer":
       return "/dashboard/buyer";
+    default:
+      throw new Error(`Unknown role: ${role}`);
   }
 };
