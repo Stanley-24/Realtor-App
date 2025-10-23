@@ -3,7 +3,7 @@ import cors from "cors";
 import config from "./config/config";
 import authRoutes from "./routes/auth.routes";
 import path from "path";
-
+import { connectDB } from "./lib/db";
 
 const app = express();
 
@@ -35,4 +35,5 @@ const PORT = config.port;
 // 🚀 Start server
 app.listen(PORT, () => {
   console.log(`⚡️ Server running on http://localhost:${PORT}`);
+  connectDB();
 });

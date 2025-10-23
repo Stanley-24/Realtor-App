@@ -6,11 +6,10 @@ import { IUser, UserRole } from '../types/User.types'; // Assuming IUser is defi
 
 const UserSchema = new Schema<IUser>(
     {
-        username: {
+        fullName: {
             type: String,
             required: [true, 'Please add a username'],
-            unique: true,
-            trim: true,
+            unique: true
         },
         email: {
             type: String,
@@ -35,6 +34,10 @@ const UserSchema = new Schema<IUser>(
         isVerified: {
             type: Boolean,
             default: false,
+        },
+        profilePicture: {
+            type: String,
+            default: "", // ✅ starts empty, can be updated later
         },
     },
     {
