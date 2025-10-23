@@ -4,8 +4,11 @@ import config from "./config/config";
 import authRoutes from "./routes/auth.routes";
 import path from "path";
 import { connectDB } from "./lib/db";
+import cookieParser from "cookie-parser";
 
 const app = express();
+
+
 
 
 
@@ -13,6 +16,8 @@ const app = express();
 // 🔧 Middleware
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
+
 app.use("/api/v1/auth", authRoutes);
 
 
