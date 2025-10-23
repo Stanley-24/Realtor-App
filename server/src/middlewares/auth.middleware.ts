@@ -23,8 +23,8 @@ export const protectRoutes = async (req: AuthRequest, res: Response, next: NextF
   }
 
   // --- 2️⃣ If no header token, check cookie ---
-  if (!token && req.cookies?.token) {
-    token = req.cookies.token.trim();
+  if (!token && req.cookies?.jwt) {
+    token = req.cookies.jwt.trim();
   }
 
   // --- 3️⃣ Reject if still no token ---
@@ -38,16 +38,18 @@ export const protectRoutes = async (req: AuthRequest, res: Response, next: NextF
       throw new Error("JWT_SECRET is not defined in environment variables");
     }
 
+    // Decode JWT
     const decoded = jwt.verify(token, secret) as JwtPayload;
 
-    if (!decoded.id) {
+    if (!decoded.userId) {
       return res.status(401).json({ message: "Invalid token payload" });
     }
 
-    req.user = await User.findById(decoded.id).select("-password");
+    // Attach user object to request (excluding password)
+    req.user = await User.findById(decoded.userId).select("-password");
 
     if (!req.user) {
-      return res.status(401).json({ message: "Invalid or expired token" });
+      return res.status(401).json({ message: "User not found or token invalid" });
     }
 
     next();

@@ -7,6 +7,8 @@ import { generateToken, getDashboardUrl } from "../lib/utils";
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { fullName, email, password, role, profilePicture }: IUserRegisterBody = req.body;
+    const normalizedEmail = email.toLowerCase();
+
 
     if (!fullName || !email || !password) {
       res.status(400).json({ message: "Please fill in all required fields" });
@@ -24,19 +26,17 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       res.status(400).json({ message: "Email already exists" });
       return;
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = await User.create({
       fullName,
-      email,
-      password: hashedPassword,
+      email: normalizedEmail,
+      password,
       role: role || "Buyer",
       profilePicture: profilePicture || "",
     });
@@ -64,3 +64,53 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
 
 
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, password } = req.body;
+
+    // --- Validation Checks ---
+    if (!email || !password) {
+      res.status(400).json({ message: "Please provide both email and password" });
+      return;
+    }
+    
+    // 1. Find user by email and explicitly select the password field
+  
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+
+
+    if (!user) {
+      res.status(401).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    // 2. Compare the plain text password with the hashed password from the database
+   
+    const isMatch = await bcrypt.compare(password, user.password!); 
+
+    if (!isMatch) {
+      res.status(401).json({ message: "Invalid credentials" });
+      return;
+    }
+    
+    // 3. Authentication successful: Generate token
+    generateToken(String(user._id), user.role, res);
+    
+    // 4. Send successful login response (exclude password)
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture,
+      },
+      redirectUrl: getDashboardUrl(user.role as string), 
+    });
+
+  } catch (error) {
+    console.error("Login error controller:", error);
+    res.status(500).json({ message: "Server error during login" });
+  }
+};
