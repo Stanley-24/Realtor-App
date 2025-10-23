@@ -12,7 +12,7 @@ export interface IUser extends Document {
     password?: string; // Hashed password is required for local users
     role: UserRole;
     isVerified: boolean;
-    profilePicture: string;
+    profilePicture?: string;
     createdAt: Date;
     updatedAt: Date;
 }

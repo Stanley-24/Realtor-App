@@ -4,7 +4,7 @@ import { IUserRegisterBody } from "../types/User.types";
 import bcrypt from "bcryptjs";
 import { generateToken, getDashboardUrl } from "../lib/utils";
 
-export const signup = async (req: Request, res: Response): Promise<void> => {
+export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { fullName, email, password, role, profilePicture }: IUserRegisterBody = req.body;
 
@@ -41,24 +41,19 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       profilePicture: profilePicture || "",
     });
 
-    if (newUser) {
-      generateToken(String(newUser._id), newUser.role, res);
-      await newUser.save();
+    generateToken(String(newUser._id), newUser.role, res);
 
-      res.status(201).json({
-        message: "User registered successfully",
-        user: {
-          _id: newUser._id,
-          fullName: newUser.fullName,
-          email: newUser.email,
-          role: newUser.role,
-          profilePicture: newUser.profilePicture,
-        },
-        redirectUrl: getDashboardUrl(newUser.role), // 👈 important for frontend
-      });
-    } else {
-      res.status(400).json({ message: "Invalid user data" });
-    }
+    res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        _id: newUser._id,
+        fullName: newUser.fullName,
+        email: newUser.email,
+        role: newUser.role,
+        profilePicture: newUser.profilePicture,
+      },
+      redirectUrl: getDashboardUrl(newUser.role), // 👈 important for frontend
+    });
   } catch (error) {
     console.error("Signup error controller:", error);
     res.status(500).json({ message: "Server error during signup" });

@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "../models/user.model";
+import config from "../config/config";
+import { IUser } from "../types/User.types";
 
 export interface AuthRequest extends Request {
-  user?: any;
+  user?: IUser;
 }
 
 export const protectRoutes = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -20,7 +22,15 @@ export const protectRoutes = async (req: AuthRequest, res: Response, next: NextF
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    const secret = config.JWT_SECRET;
+    if (!secret) {
+      throw new Error("JWT_SECRET is not defined in environment variables");
+    }
+    const decoded = jwt.verify(token, secret) as JwtPayload;
+    if (!decoded.id) {
+      res.status(401).json({ message: "Invalid token payload" });
+      return;
+    }
     req.user = await User.findById(decoded.id).select("-password");
 
     if (!req.user) {
@@ -32,6 +42,7 @@ export const protectRoutes = async (req: AuthRequest, res: Response, next: NextF
   } catch (err) {
     console.error("Protect middleware error:", err);
     res.status(401).json({ message: "Invalid or expired token" });
+    return;
   }
 };
 

@@ -6,6 +6,16 @@ import { Response } from "express";
  * Generate JWT token and set it as an HTTP-only cookie.
  */
 export const generateToken = (userId: string, role: string, res: Response): string => {
+  if (!config.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not configured");
+  }
+  if (!userId?.trim()) {
+    throw new Error("userId is required");
+  }
+  if (!role?.trim()) {
+    throw new Error("role is required");
+  }
+
   const token = jwt.sign({ userId, role }, config.JWT_SECRET, { expiresIn: "7d" });
 
   res.cookie("jwt", token, {
