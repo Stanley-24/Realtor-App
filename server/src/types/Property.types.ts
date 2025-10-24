@@ -34,4 +34,5 @@ export interface IPropertyRequestBody {
   type: PropertyType;
   status?: ListingStatus;
   images?: string[];
+  isFeatured?: boolean; // ✅ Added field (optional)
 }
