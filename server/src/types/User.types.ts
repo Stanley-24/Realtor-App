@@ -1,28 +1,26 @@
-// src/types/User.types.ts
+import { Document, Types } from 'mongoose';
 
-import { Document } from 'mongoose';
-
-// Define the available roles for authorization
 export type UserRole = 'Agent' | 'Buyer' | 'Admin';
 
-// Interface for the Mongoose Document (what is stored in MongoDB)
 export interface IUser extends Document {
-    fullName: string;
-    email: string;
-    password?: string; // Hashed password is required for local users
-    role: UserRole;
-    isVerified: boolean;
-    profilePicture?: string;
-    createdAt: Date;
-    updatedAt: Date;
+  fullName: string;
+  email: string;
+  password?: string;
+  role: UserRole;
+  isVerified: boolean;
+  profilePicture?: string;
+  listings?: Types.ObjectId[]; // References to Property listings
+  chats?: Types.ObjectId[]; // References to Chat model
+  createdAt: Date;
+  updatedAt: Date;
+
+  matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
-// Interface for User data sent in the request body during registration
 export interface IUserRegisterBody {
-    fullName: string;
-    email: string;
-    profilePicture?: string;
-    password?: string;
-    role: UserRole;
-
+  fullName: string;
+  email: string;
+  password: string;
+  role?: UserRole;
+  profilePicture?: string;
 }
