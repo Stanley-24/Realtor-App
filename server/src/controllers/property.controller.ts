@@ -12,10 +12,6 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
   let session: mongoose.ClientSession | null = null;
 
   try {
-    // Start MongoDB session
-    session = await mongoose.startSession();
-    session.startTransaction();
-
     // Trim and validate required string fields
     const title = req.body.title?.trim();
     const description = req.body.description?.trim();
@@ -25,6 +21,18 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
 
     if (!title || !description || !location || !type || !status) {
       return res.status(400).json({ message: "Required fields cannot be empty" });
+    }
+
+    // ✅ Validate enum values
+    const validTypes = ['House', 'Apartment', 'Land', 'Commercial', 'Other'];
+    const validStatuses = ['Available', 'Under Contract', 'Sold', 'Rented'];
+
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ message: "Invalid property type" });
+    }
+
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid property status" });
     }
 
     // Coerce and validate numeric fields
@@ -50,6 +58,10 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
     if (!req.user?._id) {
       return res.status(401).json({ message: "User not authenticated" });
     }
+
+    // Start MongoDB session
+    session = await mongoose.startSession();
+    session.startTransaction();
 
     // Build property object
     const propertyData = {
