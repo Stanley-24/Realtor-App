@@ -1,10 +1,16 @@
-import { Response } from "express";
+import mongoose from "mongoose";
+import { Request, Response } from "express";
 import Property from "../models/property.model";
 import User from "../models/user.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
 
-// ✅ Create new property (Agent/Admin only)
+/**
+ * ✅ Create new property (Agent/Admin only)
+ * Uses MongoDB transactions to ensure atomicity
+ */
 export const createProperty = async (req: AuthRequest, res: Response): Promise<void> => {
+  const session = await mongoose.startSession();
+
   try {
     const {
       title,
@@ -22,7 +28,9 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<v
 
     // Validate required fields
     if (!title || !description || !price || !location) {
-      res.status(400).json({ message: "Title, description, price, and location are required" });
+      res
+        .status(400)
+        .json({ message: "Title, description, price, and location are required" });
       return;
     }
 
@@ -32,33 +40,53 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<v
       return;
     }
 
-    // Create property linked to the logged-in agent
-    const property = await Property.create({
-      title,
-      description,
-      price,
-      location,
-      bedrooms,
-      bathrooms,
-      squareFootage,
-      type,
-      status,
-      images,
-      isFeatured,
-      agent: req.user._id,
-    });
+    // Start MongoDB transaction
+    session.startTransaction();
 
-    // Add property reference to agent’s listings
-    await User.findByIdAndUpdate(req.user._id, {
-      $push: { listings: property._id },
-    });
+    // Create property document inside transaction
+    const property = await Property.create(
+      [
+        {
+          title,
+          description,
+          price,
+          location,
+          bedrooms,
+          bathrooms,
+          squareFootage,
+          type,
+          status,
+          images,
+          isFeatured,
+          agent: req.user._id,
+        },
+      ],
+      { session }
+    );
+
+    // Update agent’s listings within same transaction
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $push: { listings: property[0]._id } },
+      { session }
+    );
+
+    // Commit transaction if both succeed
+    await session.commitTransaction();
 
     res.status(201).json({
       message: "Property created successfully",
-      property,
+      property: property[0],
     });
   } catch (error) {
-    console.error("Create property error:", error);
+    console.error("Create property transaction error:", error);
+
+    // Rollback changes if anything fails
+    await session.abortTransaction();
+
     res.status(500).json({ message: "Server error creating property" });
+  } finally {
+    // Clean up the session
+    session.endSession();
   }
 };
