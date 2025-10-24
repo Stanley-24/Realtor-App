@@ -17,7 +17,7 @@ const PropertySchema = new Schema<IProperty>(
     price: {
       type: Number,
       required: [true, 'Price is required'],
-      min: [0, 'Price must be a positive number'],
+      min: [1, 'Price must be a positive number'],
     },
     location: {
       type: String,
@@ -27,14 +27,17 @@ const PropertySchema = new Schema<IProperty>(
     bedrooms: {
       type: Number,
       default: 0,
+      min: [0, 'Bedrooms must be non-negative'],
     },
     bathrooms: {
       type: Number,
       default: 0,
+      min: [0, 'Bathrooms must be non-negative'],
     },
     squareFootage: {
       type: Number,
       default: 0,
+      min: [0, 'Square footage must be non-negative'],
     },
     type: {
       type: String,
