@@ -1,5 +1,6 @@
 import express from "express";
-import { registerUser, loginUser } from "../controllers/auth.controller"
+import { registerUser, loginUser, logoutUser} from "../controllers/auth.controller"
+import { protectRoutes } from "../middlewares/auth.middleware";
 
 
 const router = express.Router();
@@ -8,9 +9,7 @@ router.post("/signup", registerUser);
 
 router.post("/login", loginUser);
 
-router.get("/logout", (req, res) => {
-  res.send("Logout endpoint");
-});
+router.post("/logout", protectRoutes, logoutUser);
 
 
 export default router;

@@ -114,3 +114,22 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "Server error during login" });
   }
 };
+
+
+
+export const logoutUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Clear the cookie from the browser
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV !== "development",
+    });
+
+    // Optionally, you could also tell the client to remove any stored tokens (for SPA)
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ message: "Server error during logout" });
+  }
+};
