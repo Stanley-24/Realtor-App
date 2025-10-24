@@ -16,25 +16,34 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
     session = await mongoose.startSession();
     session.startTransaction();
 
-    const {
-      title,
-      description,
-      price,
-      location,
-      bedrooms,
-      bathrooms,
-      squareFootage,
-      type,
-      status,
-      images,
-      isFeatured,
-    } = req.body;
+    // Trim and validate required string fields
+    const title = req.body.title?.trim();
+    const description = req.body.description?.trim();
+    const location = req.body.location?.trim();
+    const type = req.body.type?.trim();
+    const status = req.body.status?.trim();
 
-    // Validate required fields
-    if (!title || !description || !price || !location) {
-      return res
-        .status(400)
-        .json({ message: "Title, description, price, and location are required" });
+    if (!title || !description || !location || !type || !status) {
+      return res.status(400).json({ message: "Required fields cannot be empty" });
+    }
+
+    // Coerce and validate numeric fields
+    const price = Number(req.body.price);
+    const bedrooms = Number(req.body.bedrooms || 0);
+    const bathrooms = Number(req.body.bathrooms || 0);
+    const squareFootage = Number(req.body.squareFootage || 0);
+
+    if (!Number.isFinite(price) || price <= 0) {
+      return res.status(400).json({ message: "Price must be a positive number" });
+    }
+    if (!Number.isFinite(bedrooms) || bedrooms < 0) {
+      return res.status(400).json({ message: "Bedrooms must be a non-negative number" });
+    }
+    if (!Number.isFinite(bathrooms) || bathrooms < 0) {
+      return res.status(400).json({ message: "Bathrooms must be a non-negative number" });
+    }
+    if (!Number.isFinite(squareFootage) || squareFootage <= 0) {
+      return res.status(400).json({ message: "Square footage must be a positive number" });
     }
 
     // Ensure authenticated user
@@ -42,26 +51,24 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
       return res.status(401).json({ message: "User not authenticated" });
     }
 
+    // Build property object
+    const propertyData = {
+      title,
+      description,
+      price,
+      location,
+      type,
+      status,
+      bedrooms,
+      bathrooms,
+      squareFootage,
+      images: req.body.images || [],
+      isFeatured: !!req.body.isFeatured,
+      agent: req.user._id,
+    };
+
     // Create property document inside transaction
-    const property = await Property.create(
-      [
-        {
-          title,
-          description,
-          price,
-          location,
-          bedrooms,
-          bathrooms,
-          squareFootage,
-          type,
-          status,
-          images,
-          isFeatured,
-          agent: req.user._id,
-        },
-      ],
-      { session }
-    );
+    const property = await Property.create([propertyData], { session });
 
     // Update agent’s listings within same transaction
     await User.findByIdAndUpdate(
