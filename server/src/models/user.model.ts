@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { IUser, UserRole } from '../types/User.types'; // Assuming IUser is defined in this directory
+import { IUser, UserRole } from '../types/User.types';
 
 const UserSchema = new Schema<IUser>(
   {
@@ -22,12 +22,12 @@ const UserSchema = new Schema<IUser>(
       type: String,
       required: [true, 'Please add a password'],
       minlength: 8,
-      select: false, // Do not return password by default on queries
+      select: false,
     },
     role: {
       type: String,
       enum: ['Agent', 'Buyer', 'Admin'] as UserRole[],
-      default: 'Buyer', // Default role for new sign-ups
+      default: 'Buyer',
     },
     isVerified: {
       type: Boolean,
@@ -35,8 +35,22 @@ const UserSchema = new Schema<IUser>(
     },
     profilePicture: {
       type: String,
-      default: '', // ✅ starts empty, can be updated later
+      default: '',
     },
+
+    // ✅ References
+    listings: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Property', // Will be connected to Property model
+      },
+    ],
+    chats: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Chat', // Will be connected to Chat model
+      },
+    ],
   },
   {
     timestamps: true,
@@ -44,22 +58,18 @@ const UserSchema = new Schema<IUser>(
 );
 
 /**
- * Mongoose Pre-Save Hook: Hash the password before saving a new user or updating the password.
+ * Hash password before saving the user
  */
 UserSchema.pre('save', async function (next) {
-  // Only run this function if password was actually modified
-  if (!this.isModified('password')) {
-    return next();
-  }
+  if (!this.isModified('password')) return next();
 
-  // Generate salt and hash the password
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password!, salt);
   next();
 });
 
 /**
- * Instance Method: Compare input password with hashed password in the database.
+ * Compare entered password with hashed password
  */
 UserSchema.methods.matchPassword = async function (enteredPassword: string) {
   if (!this.password) {

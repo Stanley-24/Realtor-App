@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import config from "./config/config";
 import authRoutes from "./routes/auth.routes";
+import propertyRoutes from "./routes/property.routes";
 import path from "path";
 import { connectDB } from "./lib/db";
 import cookieParser from "cookie-parser";
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/properties", propertyRoutes);
 
 
 
