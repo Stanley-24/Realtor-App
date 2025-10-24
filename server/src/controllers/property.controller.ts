@@ -8,10 +8,14 @@ import { AuthRequest } from "../middlewares/auth.middleware";
  * ✅ Create new property (Agent/Admin only)
  * Uses MongoDB transactions to ensure atomicity
  */
-export const createProperty = async (req: AuthRequest, res: Response): Promise<void> => {
-  const session = await mongoose.startSession();
+export const createProperty = async (req: AuthRequest, res: Response): Promise<Response> => {
+  let session: mongoose.ClientSession | null = null;
 
   try {
+    // Start MongoDB session
+    session = await mongoose.startSession();
+    session.startTransaction();
+
     const {
       title,
       description,
@@ -28,20 +32,15 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<v
 
     // Validate required fields
     if (!title || !description || !price || !location) {
-      res
+      return res
         .status(400)
         .json({ message: "Title, description, price, and location are required" });
-      return;
     }
 
     // Ensure authenticated user
     if (!req.user?._id) {
-      res.status(401).json({ message: "User not authenticated" });
-      return;
+      return res.status(401).json({ message: "User not authenticated" });
     }
-
-    // Start MongoDB transaction
-    session.startTransaction();
 
     // Create property document inside transaction
     const property = await Property.create(
@@ -74,7 +73,7 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<v
     // Commit transaction if both succeed
     await session.commitTransaction();
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Property created successfully",
       property: property[0],
     });
@@ -82,11 +81,11 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<v
     console.error("Create property transaction error:", error);
 
     // Rollback changes if anything fails
-    await session.abortTransaction();
+    if (session) await session.abortTransaction();
 
-    res.status(500).json({ message: "Server error creating property" });
+    return res.status(500).json({ message: "Server error creating property" });
   } finally {
     // Clean up the session
-    session.endSession();
+    if (session) session.endSession();
   }
 };

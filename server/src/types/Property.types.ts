@@ -10,14 +10,14 @@ export interface IProperty extends Document {
   description: string;
   price: number;
   location: string;
-  bedrooms: number;
-  bathrooms: number;
-  squareFootage: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  squareFootage?: number;
   type: PropertyType;
-  status: ListingStatus;
-  images: string[]; // Array of Cloudinary URLs
+  status?: ListingStatus;
+  images?: string[]; // Array of Cloudinary URLs
   agent: Types.ObjectId; // Refers to User model (Agent)
-  isFeatured: boolean;
+  isFeatured?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
