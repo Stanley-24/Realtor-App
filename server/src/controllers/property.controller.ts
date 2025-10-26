@@ -3,7 +3,8 @@ import { Request, Response } from "express";
 import Property from "../models/property.model";
 import User from "../models/user.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
-
+import { FilterQuery } from "mongoose";
+import { IProperty } from "../types/Property.types";
 /**
  * ✅ Create new property (Agent/Admin only)
  * Uses MongoDB transactions to ensure atomicity
@@ -106,5 +107,99 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
   } finally {
     // Clean up the session
     if (session) session.endSession();
+  }
+};
+
+
+
+export const getAllProperties = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const {
+      location,
+      type,
+      status,
+      isFeatured,
+      minPrice,
+      maxPrice,
+      bedrooms,
+      bathrooms,
+      page = "1",
+      limit = "10",
+      sortBy = "createdAt",
+      order = "desc",
+    } = req.query;
+
+    const filter: FilterQuery<IProperty> = {};
+
+    // --- Filters ---
+    if (location) {
+      const escaped = (location as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // escape regex
+      filter.location = { $regex: new RegExp(escaped, "i") };
+    }
+
+    if (type) {
+      const types = (type as string).split(","); // support multiple types
+      filter.type = { $in: types };
+    }
+
+    if (status) {
+      const statuses = (status as string).split(",");
+      filter.status = { $in: statuses };
+    }
+
+    if (isFeatured !== undefined) {
+      filter.isFeatured = (isFeatured as string).toLowerCase() === "true";
+    }
+
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      const min = Number(minPrice);
+      const max = Number(maxPrice);
+      if (!isNaN(min)) filter.price.$gte = min;
+      if (!isNaN(max)) filter.price.$lte = max;
+    }
+
+    if (bedrooms) {
+      const bd = Number(bedrooms);
+      if (!isNaN(bd)) filter.bedrooms = bd;
+    }
+
+    if (bathrooms) {
+      const ba = Number(bathrooms);
+      if (!isNaN(ba)) filter.bathrooms = ba;
+    }
+
+    // --- Pagination ---
+    const pageNumber = Math.max(Number(page), 1);
+    const pageSize = Math.max(Number(limit), 1);
+    const skip = (pageNumber - 1) * pageSize;
+
+    // --- Sorting ---
+    const sortOrder: any = {};
+    sortOrder[sortBy as string] = order === "asc" ? 1 : -1;
+
+    // --- Fetch properties ---
+    const properties = await Property.find(filter)
+      .populate("agent", "fullName email role")
+      .sort(sortOrder)
+      .skip(skip)
+      .limit(pageSize);
+
+    const total = await Property.countDocuments(filter);
+
+    res.status(200).json({
+      success: true,
+      total,
+      page: pageNumber,
+      limit: pageSize,
+      count: properties.length,
+      data: properties,
+    });
+  } catch (error) {
+    console.error("Error fetching properties:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch properties",
+    });
   }
 };
