@@ -203,11 +203,13 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
     sortOrder[sortField] = order === "asc" ? 1 : -1;
 
     // --- Fetch properties ---
-    const properties = await Property.find(filter)
-      .populate("agent", "fullName email role")
+      const properties = await Property.find(filter)
+      .lean()
+      .populate("agent", "fullName role")
       .sort(sortOrder)
       .skip(skip)
       .limit(pageSize);
+
 
     const total = await Property.countDocuments(filter);
 
