@@ -190,11 +190,15 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
     }
 
     // --- Pagination ---
-    const MAX_PAGE_SIZE = 100; // or your preferred maximum
-    const pageNumber = Math.max(Number(page), 1);
-    const pageSize = Math.min(Math.max(Number(limit), 1), MAX_PAGE_SIZE);
+    const MAX_PAGE_SIZE = 100; // consider moving to config
+    const rawPage = Number(page);
+    const rawLimit = Number(limit);
+    const pageNumber = Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : 1;
+    const pageSize = Number.isFinite(rawLimit) && rawLimit > 0
+     ? Math.min(Math.floor(rawLimit), MAX_PAGE_SIZE)
+     : Math.min(10, MAX_PAGE_SIZE);
     const skip = (pageNumber - 1) * pageSize;
-
+    
     // --- Sorting ---
     const allowedSortFields = ['createdAt', 'updatedAt', 'price', 'bedrooms', 'bathrooms', 'title'];
     const sortField = allowedSortFields.includes(sortBy as string) ? sortBy as string : 'createdAt';
