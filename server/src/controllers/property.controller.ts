@@ -137,26 +137,46 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
       filter.location = { $regex: new RegExp(escaped, "i") };
     }
 
+    const validTypes = ['House', 'Apartment', 'Land', 'Commercial', 'Other'];
+    const validStatuses = ['Available', 'Under Contract', 'Sold', 'Rented'];
     if (type) {
       const types = (type as string).split(","); // support multiple types
+      const invalidTypes = types.filter(t => !validTypes.includes(t));
+      if (invalidTypes.length > 0) {
+        res.status(400).json({ 
+          success: false, 
+          message: `Invalid property type(s): ${invalidTypes.join(', ')}` 
+        });
+        return;
+      }
       filter.type = { $in: types };
     }
-
     if (status) {
       const statuses = (status as string).split(",");
+      const invalidStatuses = statuses.filter(s => !validStatuses.includes(s));
+      if (invalidStatuses.length > 0) {
+        res.status(400).json({ 
+          success: false, 
+          message: `Invalid status(es): ${invalidStatuses.join(', ')}` 
+        });
+        return;
+      }
       filter.status = { $in: statuses };
     }
+
 
     if (isFeatured !== undefined) {
       filter.isFeatured = (isFeatured as string).toLowerCase() === "true";
     }
 
     if (minPrice || maxPrice) {
-      filter.price = {};
       const min = Number(minPrice);
       const max = Number(maxPrice);
-      if (!isNaN(min)) filter.price.$gte = min;
-      if (!isNaN(max)) filter.price.$lte = max;
+      if (!isNaN(min) || !isNaN(max)) {
+        filter.price = {};
+        if (!isNaN(min)) filter.price.$gte = min;
+        if (!isNaN(max)) filter.price.$lte = max;
+      }
     }
 
     if (bedrooms) {
@@ -170,13 +190,17 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
     }
 
     // --- Pagination ---
+    const MAX_PAGE_SIZE = 100; // or your preferred maximum
     const pageNumber = Math.max(Number(page), 1);
-    const pageSize = Math.max(Number(limit), 1);
+    const pageSize = Math.min(Math.max(Number(limit), 1), MAX_PAGE_SIZE);
     const skip = (pageNumber - 1) * pageSize;
 
     // --- Sorting ---
-    const sortOrder: any = {};
-    sortOrder[sortBy as string] = order === "asc" ? 1 : -1;
+    const allowedSortFields = ['createdAt', 'updatedAt', 'price', 'bedrooms', 'bathrooms', 'title'];
+    const sortField = allowedSortFields.includes(sortBy as string) ? sortBy as string : 'createdAt';
+    
+    const sortOrder: Record<string, 1 | -1> = {};
+    sortOrder[sortField] = order === "asc" ? 1 : -1;
 
     // --- Fetch properties ---
     const properties = await Property.find(filter)
