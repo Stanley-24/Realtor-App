@@ -233,3 +233,29 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
     });
   }
 };
+
+
+
+export const getPropertyById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    if (!id || id.length !== 24) {
+      res.status(400).json({ success: false, message: "Invalid property ID" });
+      return;
+    }
+
+    const property = await Property.findById(id)
+      .populate("agent", "fullName email role"); 
+
+    if (!property) {
+      res.status(404).json({ success: false, message: "Property not found" });
+      return;
+    }
+
+    res.status(200).json({ success: true, data: property });
+  } catch (error) {
+    console.error("Error fetching property:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch property" });
+  }
+};
