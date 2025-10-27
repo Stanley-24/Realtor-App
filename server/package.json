@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "type": "commonjs",
- "scripts": {
+  "scripts": {
     "dev": "nodemon --exec ts-node --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
@@ -15,7 +15,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.10.1"
+    "mongoose": "^8.10.1",
+    "resend": "^6.2.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
