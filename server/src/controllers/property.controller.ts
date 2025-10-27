@@ -240,7 +240,7 @@ export const getPropertyById = async (req: Request, res: Response): Promise<void
   try {
     const { id } = req.params;
 
-    if (!id || id.length !== 24) {
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
       res.status(400).json({ success: false, message: "Invalid property ID" });
       return;
     }
