@@ -3,6 +3,9 @@ import User from "../models/user.model";
 import { IUserRegisterBody } from "../types/User.types";
 import bcrypt from "bcryptjs";
 import { generateToken, getDashboardUrl } from "../lib/utils";
+import {generateWelcomeEmail} from "../emails/emailTemplate";
+import { sendEmail } from "../emails/emailHandlers";
+
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -42,6 +45,15 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     });
 
     generateToken(String(newUser._id), newUser.role, res);
+
+
+    const html = generateWelcomeEmail(newUser.fullName, newUser.role);
+    await sendEmail({
+      to: newUser.email,
+      subject: `Welcome to Realtor App, ${newUser.fullName}!`,
+      html,
+    });
+
 
     res.status(201).json({
       message: "User registered successfully",
