@@ -259,3 +259,72 @@ export const getPropertyById = async (req: Request, res: Response): Promise<void
     res.status(500).json({ success: false, message: "Failed to fetch property" });
   }
 };
+
+
+
+export const getMyListings = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user?._id) {
+      res.status(401).json({ success: false, message: "User not authenticated" });
+      return;
+    }
+
+    const { type, status, minPrice, maxPrice, sort, page = 1, limit = 10 } = req.query;
+
+    // Base query: only properties owned by the logged-in Agent
+    const query: any = { agent: req.user._id };
+
+    if (type) query.type = type;
+    if (status) query.status = status;
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // Sorting logic
+    let sortOptions: any = { createdAt: -1 }; // default: newest first
+    if (sort === "price") sortOptions = { price: 1 };
+    else if (sort === "-price") sortOptions = { price: -1 };
+    else if (sort === "date") sortOptions = { createdAt: -1 };
+
+    // Pagination setup
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Fetch listings
+    const listings = await Property.find(query)
+      .populate("agent", "fullName email role")
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limitNum);
+
+    const total = await Property.countDocuments(query);
+
+    // ✅ Handle no results found
+    if (!listings || listings.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "No listings found for your account with the specified filters.",
+      });
+      return;
+    }
+
+    // ✅ Success response
+    res.status(200).json({
+      success: true,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      count: listings.length,
+      data: listings,
+    });
+  } catch (error) {
+    console.error("Error fetching agent listings:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch agent listings. Please try again later.",
+    });
+  }
+};
