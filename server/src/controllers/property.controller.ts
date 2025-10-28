@@ -217,6 +217,14 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
 
     const total = await Property.countDocuments(filter);
 
+    if (!properties.length) {
+      res.status(404).json({
+        success: false,
+        message: "No properties found matching your criteria",
+      });
+      return;
+    }
+
     res.status(200).json({
       success: true,
       total,
