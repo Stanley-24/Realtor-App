@@ -269,7 +269,6 @@ export const getPropertyById = async (req: Request, res: Response): Promise<void
 };
 
 
-
 export const getMyListings = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (!req.user?._id) {
@@ -280,41 +279,92 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
     const { type, status, minPrice, maxPrice, sort, page = 1, limit = 10 } = req.query;
 
     // Base query: only properties owned by the logged-in Agent
-    const query: any = { agent: req.user._id };
+    const baseQuery: any = { agent: req.user._id };
+    const query = { ...baseQuery };
 
+    // --- Type & Status filters ---
     if (type) query.type = type;
     if (status) query.status = status;
-    if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
+
+    // --- Price filter with validation ---
+    const min = Number(minPrice);
+    const max = Number(maxPrice);
+
+    if ((minPrice && isNaN(min)) || (maxPrice && isNaN(max))) {
+      res.status(400).json({
+        success: false,
+        message: "minPrice and maxPrice must be valid numbers",
+      });
+      return;
     }
 
-    // Sorting logic
-    let sortOptions: any = { createdAt: -1 }; // default: newest first
+    if ((min < 0) || (max < 0)) {
+      res.status(400).json({
+        success: false,
+        message: "minPrice and maxPrice cannot be negative",
+      });
+      return;
+    }
+
+    if (Number.isFinite(min) || Number.isFinite(max)) {
+      if (Number.isFinite(min) && Number.isFinite(max) && min > max) {
+        res.status(400).json({ success: false, message: "minPrice cannot exceed maxPrice" });
+        return;
+      }
+      query.price = {};
+      if (Number.isFinite(min)) query.price.$gte = min;
+      if (Number.isFinite(max)) query.price.$lte = max;
+    }
+
+    // --- Sorting logic ---
+    let sortOptions: any = { createdAt: -1 };
     if (sort === "price") sortOptions = { price: 1 };
     else if (sort === "-price") sortOptions = { price: -1 };
     else if (sort === "date") sortOptions = { createdAt: -1 };
 
-    // Pagination setup
-    const pageNum = Number(page);
-    const limitNum = Number(limit);
+    // --- Pagination setup ---
+    const MAX_PAGE_SIZE = 100;
+    const pageNum = Math.max(Number(page) || 1, 1);
+    const limitNum = Math.min(Number(limit) || 10, MAX_PAGE_SIZE);
     const skip = (pageNum - 1) * limitNum;
 
-    // Fetch listings
+    // --- Total agent listings (before filters) ---
+    const agentTotal = await Property.countDocuments(baseQuery);
+
+    if (agentTotal === 0) {
+      res.status(404).json({
+        success: false,
+        message: "You haven’t published any listings yet.",
+      });
+      return;
+    }
+
+    // --- Fetch filtered listings ---
     const listings = await Property.find(query)
       .populate("agent", "fullName email role")
       .sort(sortOptions)
       .skip(skip)
       .limit(limitNum);
 
-    const total = await Property.countDocuments(query);
+    const filteredTotal = await Property.countDocuments(query);
 
-    // ✅ Handle no results found
-    if (!listings || listings.length === 0) {
+    if (filteredTotal === 0) {
       res.status(404).json({
         success: false,
-        message: "No listings found for your account with the specified filters.",
+        message: "No listings found matching your search filters.",
+      });
+      return;
+    }
+
+    if (listings.length === 0) {
+      res.status(200).json({
+        success: true,
+        total: filteredTotal,
+        page: pageNum,
+        limit: limitNum,
+        count: 0,
+        data: [],
+        message: "You’ve reached the end of your listings.",
       });
       return;
     }
@@ -322,12 +372,13 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
     // ✅ Success response
     res.status(200).json({
       success: true,
-      total,
+      total: filteredTotal,
       page: pageNum,
       limit: limitNum,
       count: listings.length,
       data: listings,
     });
+
   } catch (error) {
     console.error("Error fetching agent listings:", error);
     res.status(500).json({
