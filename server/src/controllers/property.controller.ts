@@ -281,9 +281,31 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
     // Base query: only properties owned by the logged-in Agent
     const baseQuery: FilterQuery<IProperty> = { agent: req.user._id };
     const query: FilterQuery<IProperty> = { ...baseQuery };
+
   // --- Type & Status filters ---
-    if (type) query.type = type;
-    if (status) query.status = status;
+    const validTypes = ['House', 'Apartment', 'Land', 'Commercial', 'Other'];
+    const validStatuses = ['Available', 'Under Contract', 'Sold', 'Rented'];
+    
+    if (type) {
+      if (!validTypes.includes(type as string)) {
+       res.status(400).json({ 
+         success: false, 
+         message: `Invalid property type: ${type}` 
+       });
+       return;
+     }
+     query.type = type;
+   }
+   if (status) {
+     if (!validStatuses.includes(status as string)) {
+       res.status(400).json({ 
+         success: false, 
+         message: `Invalid status: ${status}` 
+       });
+       return;
+     }
+     query.status = status;
+   }
 
     // --- Price filter with validation ---
     const min = Number(minPrice);
