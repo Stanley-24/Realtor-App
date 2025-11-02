@@ -279,10 +279,9 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
     const { type, status, minPrice, maxPrice, sort, page = 1, limit = 10 } = req.query;
 
     // Base query: only properties owned by the logged-in Agent
-    const baseQuery: any = { agent: req.user._id };
-    const query = { ...baseQuery };
-
-    // --- Type & Status filters ---
+    const baseQuery: FilterQuery<IProperty> = { agent: req.user._id };
+    const query: FilterQuery<IProperty> = { ...baseQuery };
+  // --- Type & Status filters ---
     if (type) query.type = type;
     if (status) query.status = status;
 
@@ -317,7 +316,7 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     // --- Sorting logic ---
-    let sortOptions: any = { createdAt: -1 };
+    let sortOptions: Record<string, 1 | -1> = { createdAt: -1 };
     if (sort === "price") sortOptions = { price: 1 };
     else if (sort === "-price") sortOptions = { price: -1 };
     else if (sort === "date") sortOptions = { createdAt: -1 };
