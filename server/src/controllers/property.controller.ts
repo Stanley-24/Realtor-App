@@ -285,7 +285,7 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
   // --- Type & Status filters ---
     const validTypes = ['House', 'Apartment', 'Land', 'Commercial', 'Other'];
     const validStatuses = ['Available', 'Under Contract', 'Sold', 'Rented'];
-    
+
     if (type) {
       if (!validTypes.includes(type as string)) {
        res.status(400).json({ 
@@ -360,12 +360,7 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    // --- Fetch filtered listings ---
-    const listings = await Property.find(query)
-      .populate("agent", "fullName email role")
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(limitNum);
+    
 
     const filteredTotal = await Property.countDocuments(query);
 
@@ -377,6 +372,14 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
+    // --- Fetch filtered listings ---
+    const listings = await Property.find(query)
+      .populate("agent", "fullName email role")
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limitNum);
+
+      
     if (listings.length === 0) {
       res.status(200).json({
         success: true,
