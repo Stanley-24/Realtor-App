@@ -217,6 +217,14 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
 
     const total = await Property.countDocuments(filter);
 
+    if (!properties.length) {
+      res.status(404).json({
+        success: false,
+        message: "No properties found matching your criteria",
+      });
+      return;
+    }
+
     res.status(200).json({
       success: true,
       total,
@@ -257,5 +265,149 @@ export const getPropertyById = async (req: Request, res: Response): Promise<void
   } catch (error) {
     console.error("Error fetching property:", error);
     res.status(500).json({ success: false, message: "Failed to fetch property" });
+  }
+};
+
+
+export const getMyListings = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user?._id) {
+      res.status(401).json({ success: false, message: "User not authenticated" });
+      return;
+    }
+
+    const { type, status, minPrice, maxPrice, sort, page = 1, limit = 10 } = req.query;
+
+    // Base query: only properties owned by the logged-in Agent
+    const baseQuery: FilterQuery<IProperty> = { agent: req.user._id };
+    const query: FilterQuery<IProperty> = { ...baseQuery };
+
+  // --- Type & Status filters ---
+    const validTypes = ['House', 'Apartment', 'Land', 'Commercial', 'Other'];
+    const validStatuses = ['Available', 'Under Contract', 'Sold', 'Rented'];
+
+    if (type) {
+      if (!validTypes.includes(type as string)) {
+       res.status(400).json({ 
+         success: false, 
+         message: `Invalid property type: ${type}` 
+       });
+       return;
+     }
+     query.type = type;
+   }
+   if (status) {
+     if (!validStatuses.includes(status as string)) {
+       res.status(400).json({ 
+         success: false, 
+         message: `Invalid status: ${status}` 
+       });
+       return;
+     }
+     query.status = status;
+   }
+
+    // --- Price filter with validation ---
+    const min = Number(minPrice);
+    const max = Number(maxPrice);
+
+    if ((minPrice && isNaN(min)) || (maxPrice && isNaN(max))) {
+      res.status(400).json({
+        success: false,
+        message: "minPrice and maxPrice must be valid numbers",
+      });
+      return;
+    }
+
+    if ((min < 0) || (max < 0)) {
+      res.status(400).json({
+        success: false,
+        message: "minPrice and maxPrice cannot be negative",
+      });
+      return;
+    }
+
+    if (Number.isFinite(min) || Number.isFinite(max)) {
+      if (Number.isFinite(min) && Number.isFinite(max) && min > max) {
+        res.status(400).json({ success: false, message: "minPrice cannot exceed maxPrice" });
+        return;
+      }
+      query.price = {};
+      if (Number.isFinite(min)) query.price.$gte = min;
+      if (Number.isFinite(max)) query.price.$lte = max;
+    }
+
+    // --- Sorting logic ---
+    let sortOptions: Record<string, 1 | -1> = { createdAt: -1 };
+    if (sort === "price") sortOptions = { price: 1 };
+    else if (sort === "-price") sortOptions = { price: -1 };
+    else if (sort === "date") sortOptions = { createdAt: -1 };
+
+    // --- Pagination setup ---
+    const MAX_PAGE_SIZE = 100;
+    const pageNum = Math.max(Number(page) || 1, 1);
+    const limitNum = Math.min(Number(limit) || 10, MAX_PAGE_SIZE);
+    const skip = (pageNum - 1) * limitNum;
+
+    // --- Total agent listings (before filters) ---
+    const agentTotal = await Property.countDocuments(baseQuery);
+
+    if (agentTotal === 0) {
+      res.status(404).json({
+        success: false,
+        message: "You haven’t published any listings yet.",
+      });
+      return;
+    }
+
+    
+
+    const filteredTotal = await Property.countDocuments(query);
+
+    if (filteredTotal === 0) {
+      res.status(404).json({
+        success: false,
+        message: "No listings found matching your search filters.",
+      });
+      return;
+    }
+
+    // --- Fetch filtered listings ---
+    const listings = await Property.find(query)
+      .populate("agent", "fullName email role")
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limitNum);
+
+      
+    if (listings.length === 0) {
+      res.status(200).json({
+        success: true,
+        total: filteredTotal,
+        page: pageNum,
+        limit: limitNum,
+        count: 0,
+        data: [],
+        message: "You’ve reached the end of your listings.",
+      });
+      return;
+    }
+
+    // ✅ Success response
+    res.status(200).json({
+      success: true,
+      total: filteredTotal,
+      page: pageNum,
+      limit: limitNum,
+      count: listings.length,
+      data: listings,
+    });
+
+  } catch (error) {
+    console.error("Error fetching agent listings:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch agent listings. Please try again later.",
+    });
   }
 };
