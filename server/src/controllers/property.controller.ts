@@ -526,7 +526,38 @@ export const updateProperty = async (req: AuthRequest, res: Response): Promise<v
       }
       updates.price = parsedPrice;
     }
-
+    
+    // --- Validate numeric fields ---
+    const ensureNonNegative = (
+      value: unknown,
+      field: "bedrooms" | "bathrooms" | "squareFootage"
+    ): number => {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed) || parsed < 0 || (field === "squareFootage" && parsed <= 0)) {
+        throw field;
+      }
+      return field === "squareFootage" ? parsed : Math.floor(parsed);
+    };
+    try {
+      if (updates.bedrooms !== undefined) {
+        updates.bedrooms = ensureNonNegative(updates.bedrooms, "bedrooms");
+      }
+      if (updates.bathrooms !== undefined) {
+        updates.bathrooms = ensureNonNegative(updates.bathrooms, "bathrooms");
+      }
+      if (updates.squareFootage !== undefined) {
+        updates.squareFootage = ensureNonNegative(updates.squareFootage, "squareFootage");
+      }
+    } catch (field) {
+      res.status(400).json({
+        success: false,
+        message:
+          field === "squareFootage"
+            ? "Square footage must be a positive number"
+            : `${field as string} must be a non-negative number`,
+      });
+      return;
+    }
     // --- Ensure images array exists ---
     property.images = property.images || [];
 
