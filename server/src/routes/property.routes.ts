@@ -4,9 +4,12 @@ import {
   createProperty,
   getAllProperties,
   getPropertyById,
-  getMyListings
+  getMyListings,
+  updateProperty
 
 } from "../controllers/property.controller";
+
+import { upload } from "../lib/multer";
 
 import { 
   protectRoutes, 
@@ -16,9 +19,22 @@ import {
 const router = express.Router();
 
 // Protected — Only Agent can create
-router.post("/createProperty", protectRoutes, authorizeRoutes("Agent"), createProperty);
+router.post(
+  "/createProperty", 
+  protectRoutes, 
+  upload.array("images", 10), // Accept up to 10 images
+  authorizeRoutes("Agent"), 
+  createProperty
+);
 
 router.get("/myListings", protectRoutes, authorizeRoutes("Agent", "Admin"), getMyListings);
+router.put(
+  "/updateProperty/:id", 
+  protectRoutes, 
+  upload.array("images", 10),
+  authorizeRoutes("Agent", "Admin"), 
+  updateProperty
+);
 // Public — Get all properties 
 router.get("/getProperties", getAllProperties);
 

@@ -4,7 +4,16 @@ import Property from "../models/property.model";
 import User from "../models/user.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { FilterQuery } from "mongoose";
-import { IProperty } from "../types/Property.types";
+import { 
+  IProperty,
+  IUpdatePropertyRequest,
+  ListingStatus, 
+  PropertyType 
+} from "../types/Property.types";
+import { 
+  uploadMultipleImagesToCloudinary,
+  deleteImageFromCloudinary
+} from "../lib/cloudinary";
 /**
  * ✅ Create new property (Agent/Admin only)
  * Uses MongoDB transactions to ensure atomicity
@@ -25,8 +34,8 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
     }
 
     // ✅ Validate enum values
-    const validTypes = ['House', 'Apartment', 'Land', 'Commercial', 'Other'];
-    const validStatuses = ['Available', 'Under Contract', 'Sold', 'Rented'];
+    const validTypes: PropertyType[] = ['House', 'Apartment', 'Land', 'Commercial', 'Other'];
+    const validStatuses: ListingStatus[] = ['Available', 'Under Contract', 'Sold', 'Rented'];
 
     if (!validTypes.includes(type)) {
       return res.status(400).json({ message: "Invalid property type" });
@@ -64,6 +73,37 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
     session = await mongoose.startSession();
     session.startTransaction();
 
+    let imageUrls: string[] = [];
+    const files = req.files as Express.Multer.File[] | undefined;
+    // ⚙️ Image validations
+    if (files && files.length > 0) {
+      // 1️⃣ Check count
+      if (files.length > 10) {
+        return res.status(400).json({ message: "You can upload up to 10 images only" });
+      }
+
+      // 2️⃣ Validate MIME type
+      const validMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (files.some((f) => !validMimeTypes.includes(f.mimetype))) {
+        return res.status(400).json({
+          message: "Invalid file type — only JPG, PNG, or WEBP allowed",
+        });
+      }
+
+      // 3️⃣ Upload to Cloudinary
+      try {
+        const buffers = files.map((file) => file.buffer);
+        imageUrls = await uploadMultipleImagesToCloudinary(buffers, "properties");
+
+        if (imageUrls.length !== buffers.length) {
+          throw new Error("Some images failed to upload");
+        }
+      } catch (uploadErr) {
+        await session.abortTransaction();
+        console.error("Image upload failed:", uploadErr);
+        return res.status(500).json({ message: "Error uploading images" });
+      }
+    }
     // Build property object
     const propertyData = {
       title,
@@ -75,7 +115,7 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
       bedrooms,
       bathrooms,
       squareFootage,
-      images: req.body.images || [],
+      images: imageUrls,
       isFeatured: !!req.body.isFeatured,
       agent: req.user._id,
     };
@@ -409,5 +449,161 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
       success: false,
       message: "Failed to fetch agent listings. Please try again later.",
     });
+  }
+};
+
+
+export const updateProperty = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const body = req.body as IUpdatePropertyRequest;
+    const files = req.files as Express.Multer.File[] | undefined;
+
+    // --- Validate ID ---
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({ success: false, message: "Invalid property ID" });
+      return;
+    }
+
+    // --- Ensure user authenticated ---
+    if (!req.user?._id) {
+      res.status(401).json({ success: false, message: "User not authenticated" });
+      return;
+    }
+
+    // --- Fetch property ---
+    const property = await Property.findById(id);
+    if (!property) {
+      res.status(404).json({ success: false, message: "Property not found" });
+      return;
+    }
+
+    // --- Authorization check ---
+    const isAdmin = req.user.role === "Admin";
+    const isOwner = property.agent.toString() === req.user._id.toString();
+    if (!isAdmin && !isOwner) {
+      res.status(403).json({ success: false, message: "You’re not allowed to update this property" });
+      return;
+    }
+
+    // --- Prepare updates safely ---
+    const allowedUpdates: (keyof IUpdatePropertyRequest)[] = [
+      "title",
+      "description",
+      "price",
+      "location",
+      "type",
+      "status",
+      "bedrooms",
+      "bathrooms",
+      "squareFootage",
+      "isFeatured",
+    ];
+
+    const updates: Partial<IUpdatePropertyRequest> = {};
+    allowedUpdates.forEach((key) => {
+      if (body[key] !== undefined) updates[key] = body[key] as any;
+    });
+
+    // --- Validate enums ---
+    const validTypes: PropertyType[] = ["House", "Apartment", "Land", "Commercial", "Other"];
+    const validStatuses: ListingStatus[] = ["Available", "Under Contract", "Sold", "Rented"];
+    if (updates.type && !validTypes.includes(updates.type)) {
+      res.status(400).json({ success: false, message: "Invalid property type" });
+      return;
+    }
+    if (updates.status && !validStatuses.includes(updates.status)) {
+      res.status(400).json({ success: false, message: "Invalid property status" });
+      return;
+    }
+
+    // --- Validate and normalize price ---
+    if (updates.price !== undefined) {
+      const parsedPrice = Number(updates.price);
+      if (isNaN(parsedPrice) || parsedPrice <= 0) {
+        res.status(400).json({ success: false, message: "Price must be a positive number" });
+        return;
+      }
+      updates.price = parsedPrice;
+    }
+
+    // --- Ensure images array exists ---
+    property.images = property.images || [];
+
+    // --- Handle new file uploads ---
+    if (files && files.length > 0) {
+      if (files.length > 10) {
+        res.status(400).json({ success: false, message: "You can upload up to 10 images only" });
+        return;
+      }
+
+      const validMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (files.some((f) => !validMimeTypes.includes(f.mimetype))) {
+        res.status(400).json({ success: false, message: "Invalid file type — only JPG, PNG, WEBP allowed" });
+        return;
+      }
+
+      try {
+        const buffers = files.map((file) => file.buffer);
+        const newImageUrls = await uploadMultipleImagesToCloudinary(buffers, "properties");
+        property.images!.push(...newImageUrls); // ✅ non-null assertion
+        console.log("✅ Uploaded new images:", newImageUrls);
+      } catch (uploadErr) {
+        console.error("❌ Image upload failed:", uploadErr);
+        res.status(500).json({ success: false, message: "Error uploading images" });
+        return;
+      }
+    }
+
+    // --- Handle image removals safely ---
+    let removeImages: string[] = [];
+    if (body.removeImages) {
+      if (typeof body.removeImages === "string") {
+        try {
+          removeImages = JSON.parse(body.removeImages);
+          if (!Array.isArray(removeImages)) removeImages = [];
+        } catch {
+          removeImages = [];
+        }
+      } else if (Array.isArray(body.removeImages)) {
+        removeImages = body.removeImages;
+      }
+    }
+
+    if (removeImages.length > 0) {
+      const imagesToRemove = removeImages.filter((url) => property.images!.includes(url));
+      property.images! = property.images!.filter((img) => !imagesToRemove.includes(img));
+
+      for (const img of imagesToRemove) {
+        try {
+          await deleteImageFromCloudinary(img);
+        } catch (err) {
+          console.warn("⚠️ Failed to delete removed image:", img, err);
+        }
+      }
+    }
+
+
+    // --- Apply other updates ---
+    for (const [key, value] of Object.entries(updates)) {
+      if (value !== undefined) {
+        // @ts-expect-error dynamic assignment is safe
+        property[key] = value;
+      }
+    }
+
+    await property.save();
+    const updatedProperty = await Property.findById(id).populate("agent", "fullName email role");
+
+    console.log("✅ Property updated:", updatedProperty);
+
+    res.status(200).json({
+      success: true,
+      message: "Property updated successfully",
+      data: updatedProperty,
+    });
+  } catch (error) {
+    console.error("Error updating property:", error);
+    res.status(500).json({ success: false, message: "Failed to update property. Please try again later." });
   }
 };

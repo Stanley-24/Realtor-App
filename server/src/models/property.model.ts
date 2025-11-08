@@ -52,6 +52,14 @@ const PropertySchema = new Schema<IProperty>(
     images: {
       type: [String],
       default: [],
+      validate: {
+        validator: function (urls: string[]) {
+          return urls.every(url =>
+            /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url)
+          );
+        },
+        message: 'Each image must be a valid image URL (jpg, jpeg, png, webp, gif, svg)',
+      },
     },
     agent: {
       type: Schema.Types.ObjectId,

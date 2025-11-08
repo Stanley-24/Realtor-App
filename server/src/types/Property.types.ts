@@ -4,6 +4,9 @@ import { Document, Types } from 'mongoose';
 export type PropertyType = 'House' | 'Apartment' | 'Land' | 'Commercial' | 'Other';
 export type ListingStatus = 'Available' | 'Under Contract' | 'Sold' | 'Rented';
 
+export interface IUpdatePropertyRequest extends Partial<IPropertyRequestBody> {};
+
+
 // --- Property Document Interface ---
 export interface IProperty extends Document {
   title: string;
@@ -15,7 +18,7 @@ export interface IProperty extends Document {
   squareFootage?: number;
   type: PropertyType;
   status?: ListingStatus;
-  images?: string[]; // Array of Cloudinary URLs
+  images?: string[]; // Array of image URLs
   agent: Types.ObjectId; // Refers to User model (Agent)
   isFeatured?: boolean;
   createdAt: Date;
@@ -35,4 +38,7 @@ export interface IPropertyRequestBody {
   status?: ListingStatus;
   images?: string[];
   isFeatured?: boolean; // ✅ Added field (optional)
+  addImages?: string[]; 
+  removeImages?: string[];
+  replaceAllImages?: string[];
 }
