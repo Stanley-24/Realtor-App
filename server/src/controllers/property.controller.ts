@@ -526,7 +526,7 @@ export const updateProperty = async (req: AuthRequest, res: Response): Promise<v
       }
       updates.price = parsedPrice;
     }
-    
+
     // --- Validate numeric fields ---
     const ensureNonNegative = (
       value: unknown,
@@ -567,7 +567,13 @@ export const updateProperty = async (req: AuthRequest, res: Response): Promise<v
         res.status(400).json({ success: false, message: "You can upload up to 10 images only" });
         return;
       }
-
+      const currentImageCount = property.images!.length;
+      if (currentImageCount + files.length > 10) {
+        res
+          .status(400)
+          .json({ success: false, message: "You can only keep up to 10 images per property" });
+        return;
+      }
       const validMimeTypes = ["image/jpeg", "image/png", "image/webp"];
       if (files.some((f) => !validMimeTypes.includes(f.mimetype))) {
         res.status(400).json({ success: false, message: "Invalid file type — only JPG, PNG, WEBP allowed" });
