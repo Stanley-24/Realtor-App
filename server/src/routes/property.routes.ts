@@ -22,8 +22,8 @@ const router = express.Router();
 router.post(
   "/createProperty", 
   protectRoutes, 
-  upload.array("images", 10), // Accept up to 10 images
   authorizeRoutes("Agent"), 
+  upload.array("images", 10), // Accept up to 10 images
   createProperty
 );
 
@@ -31,8 +31,8 @@ router.get("/myListings", protectRoutes, authorizeRoutes("Agent", "Admin"), getM
 router.put(
   "/updateProperty/:id", 
   protectRoutes, 
-  upload.array("images", 10),
   authorizeRoutes("Agent", "Admin"), 
+  upload.array("images", 10),
   updateProperty
 );
 // Public — Get all properties 
