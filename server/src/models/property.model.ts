@@ -57,7 +57,7 @@ const PropertySchema = new Schema<IProperty>(
           return (
             urls.length <= 10 &&
             urls.every(url =>
-              /^https?:\/\/.\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url)
+              /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url)
             )
           );
         },
