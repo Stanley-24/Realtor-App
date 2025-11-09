@@ -12,6 +12,9 @@ interface Config {
   EMAIL_TO: string;
   CLIENT_URL: string;
   NAME: string;
+  cloud_name: string;
+  api_key: string;
+  api_secret: string;
 }
 
 const config: Config = {
@@ -38,7 +41,15 @@ const config: Config = {
   NAME: process.env.NAME || (() => {
     throw new Error('NAME environment variable is required');
   })(),
-
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || (() => {
+    throw new Error('CLOUDINARY_CLOUD_NAME environment variable is required');
+  })(),
+  api_key: process.env.CLOUDINARY_API_KEY || (() => {
+    throw new Error('CLOUDINARY_API_KEY environment variable is required');
+  })(),
+  api_secret: process.env.CLOUDINARY_API_SECRET || (() => {
+    throw new Error('CLOUDINARY_API_SECRET environment variable is required');
+  })(),
 };
 
 export default config;

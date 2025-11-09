@@ -52,6 +52,18 @@ const PropertySchema = new Schema<IProperty>(
     images: {
       type: [String],
       default: [],
+      validate: {
+        validator: function (urls: string[]) {
+          return (
+            urls.length <= 10 &&
+            urls.every(url =>
+              /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url)
+            )
+          );
+        },
+        message:
+          'Provide up to 10 image URLs, each ending in jpg, jpeg, png, webp, gif, or svg',
+      },
     },
     agent: {
       type: Schema.Types.ObjectId,
@@ -68,7 +80,7 @@ const PropertySchema = new Schema<IProperty>(
   }
 );
 
-// Optional: index for faster searches (location + price)
+// Optional: index for faster searches (location  price)
 PropertySchema.index({ location: 1, price: 1 });
 
 const Property = model<IProperty>('Property', PropertySchema);
