@@ -3,6 +3,7 @@ import cors from "cors";
 import config from "./config/config";
 import authRoutes from "./routes/auth.routes";
 import propertyRoutes from "./routes/property.routes";
+import healthRoutes from "./routes/health.checker"
 import path from "path";
 import { connectDB } from "./lib/db";
 import cookieParser from "cookie-parser";
@@ -22,6 +23,9 @@ app.use(
 // 🔧 Middleware
 app.use(express.json());
 app.use(cookieParser());
+
+// health checker
+app.use("/api/v1", healthRoutes);
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/properties", propertyRoutes);
