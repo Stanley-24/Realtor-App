@@ -13,6 +13,7 @@ export interface IUser extends Document {
   chats?: Types.ObjectId[]; // References to Chat model
   createdAt: Date;
   updatedAt: Date;
+  authProvider: 'local' | 'google';
 
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
