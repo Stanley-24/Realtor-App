@@ -11,10 +11,10 @@ export default function GoogleAuthButton() {
 
   const handleGoogleCallback = useCallback(async (response: GoogleAuthResponse) => {
     const idToken = response.credential;
-    storeGoogleIdToken(idToken);
 
     try {
       const redirectUrl = await googleLogin(idToken);
+      storeGoogleIdToken(idToken);
       console.log("Google login redirect URL:", redirectUrl);
       if (redirectUrl) {
         // Navigate immediately - authStore is now synced
