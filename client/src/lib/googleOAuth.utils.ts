@@ -44,14 +44,18 @@ export const syncGoogleUserToAuthStore = (userData: {
   email: string;
   role: string;
 }) => {
-  const authUser = {
-    _id: userData._id || userData.id || "",
-    fullName: userData.fullName,
-    email: userData.email,
-    role: userData.role.toLowerCase(), // Normalize role to match ProtectedRoute format
-  };
-  useAuthStore.setState({ user: authUser, initializing: false });
-};
+  if (!userData._id && !userData.id) {
+   throw new Error("User data must contain either _id or id");
+  }
+  
+   const authUser = {
+     _id: userData._id || userData.id || "",
+     fullName: userData.fullName,
+     email: userData.email,
+    role: userData.role?.toLowerCase() ?? "user", 
+   };
+   useAuthStore.setState({ user: authUser, initializing: false });
+ };
 
 /**
  * Store token in localStorage
