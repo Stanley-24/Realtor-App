@@ -20,9 +20,16 @@ const UserSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: [true, 'Please add a password'],
+      required: function (): boolean {
+        return this.authProvider === 'local';
+      },
       minlength: 8,
       select: false,
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
     role: {
       type: String,
@@ -61,7 +68,7 @@ const UserSchema = new Schema<IUser>(
  * Hash password before saving the user
  */
 UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password') || !this.password) return next();
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password!, salt);
