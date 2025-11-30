@@ -57,8 +57,14 @@ export const syncGoogleUserToAuthStore = (userData: {
  * Store token in localStorage
  */
 export const storeAuthToken = (token: string | null | undefined) => {
-  if (token) {
-    localStorage.setItem("token", token);
+  try {
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+    }
+  } catch (error) {
+    console.error("Failed to store auth token:", error);
   }
 };
 
