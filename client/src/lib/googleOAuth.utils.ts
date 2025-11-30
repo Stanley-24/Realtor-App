@@ -66,7 +66,11 @@ export const storeAuthToken = (token: string | null | undefined) => {
  * Store Google ID token in localStorage
  */
 export const storeGoogleIdToken = (idToken: string) => {
-  localStorage.setItem("google_id_token", idToken);
+  try {
+    localStorage.setItem("google_id_token", idToken);
+  } catch (error) {
+    console.error("Failed to store Google ID token:", error);
+  }
 };
 
 /**
