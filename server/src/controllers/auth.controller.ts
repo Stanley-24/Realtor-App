@@ -3,9 +3,8 @@ import User from "../models/user.model";
 import { IUserRegisterBody } from "../types/User.types";
 import bcrypt from "bcryptjs";
 import { generateToken, getDashboardUrl } from "../lib/utils";
-import {generateWelcomeEmail} from "../emails/emailTemplate";
-import { sendEmail } from "../emails/emailHandlers";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import { sendWelcomeEmail } from "../emails/emailerSender";
 
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
@@ -45,15 +44,9 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       profilePicture: profilePicture || "",
     });
 
+    // Generate JWT
     generateToken(String(newUser._id), newUser.role, res);
-
-
-    const html = generateWelcomeEmail(newUser.fullName, newUser.role);
-    await sendEmail({
-      to: newUser.email,
-      subject: `Welcome to Realtor App, ${newUser.fullName}!`,
-      html,
-    });
+    sendWelcomeEmail(newUser, res);
 
 
     res.status(201).json({
