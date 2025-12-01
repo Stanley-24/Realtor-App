@@ -126,6 +126,11 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
         credentials: "include",
       });
 
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: "Network error" }));
+        throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
+      }
+
       const data = await res.json();
 
       if (data.status === "SIGNUP_COMPLETE") {
