@@ -57,36 +57,4 @@ export const syncGoogleUserToAuthStore = (userData: {
    useAuthStore.setState({ user: authUser, initializing: false });
  };
 
-/**
- * Store token in localStorage
- */
-export const storeAuthToken = (token: string | null | undefined) => {
-  try {
-    if (token) {
-      localStorage.setItem("token", token);
-    } else {
-      localStorage.removeItem("token");
-    }
-  } catch (error) {
-    console.error("Failed to store auth token:", error);
-  }
-};
-
-/**
- * Store Google ID token in localStorage
- */
-export const storeGoogleIdToken = (idToken: string) => {
-  try {
-    localStorage.setItem("google_id_token", idToken);
-  } catch (error) {
-    console.error("Failed to store Google ID token:", error);
-  }
-};
-
-/**
- * Get Google ID token from localStorage
- */
-export const getGoogleIdToken = (): string | null => {
-  return localStorage.getItem("google_id_token");
-};
 

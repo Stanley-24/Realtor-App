@@ -2,8 +2,6 @@ import { create } from "zustand";
 import { apiConfig } from "../config";
 import {
   syncGoogleUserToAuthStore,
-  storeAuthToken,
-  getGoogleIdToken,
 } from "../lib/googleOAuth.utils";
 
 interface PendingGoogleUser {
@@ -11,6 +9,7 @@ interface PendingGoogleUser {
   email: string;
   profilePicture: string;
   role?: string;
+  idToken?: string; // Store Google ID token in state (not localStorage)
 }
 
 interface GoogleUser {
@@ -59,7 +58,7 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
       console.log("Google login response:", data);
 
       if (data.status === "EXISTING_USER") {
-        storeAuthToken(data.token);
+        // Sync user to authStore - cookie is already set by backend
         syncGoogleUserToAuthStore(data.user);
         
         set({ 
@@ -77,17 +76,19 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
       }
 
       if (data.status === "NEW_USER") {
+        // Store idToken in state for complete-signup flow
         set({
           pendingGoogleUser: {
             fullName: data.fullName,
             email: data.email,
             profilePicture: data.profilePicture,
+            idToken: idToken, // Store in state, not localStorage
           },
           loading: false,
         });
 
         console.log("New user, redirecting to:", data.redirectUrl);
-        return data.redirectUrl; // always use backend redirect
+        return data.redirectUrl;
       }
 
       set({ loading: false, error: "Unexpected response from server" });
@@ -107,6 +108,11 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
       return;
     }
 
+    if (!pending.idToken) {
+      set({ error: "Google ID token missing" });
+      return;
+    }
+
     set({ loading: true, error: null });
 
     try {
@@ -114,7 +120,7 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          idToken: getGoogleIdToken(),
+          idToken: pending.idToken,
           role: pending.role,
         }),
         credentials: "include",
@@ -123,10 +129,11 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
       const data = await res.json();
 
       if (data.status === "SIGNUP_COMPLETE") {
-        storeAuthToken(data.token);
+        // Sync user to authStore - cookie is already set by backend
         syncGoogleUserToAuthStore(data.user);
         
-        set({ user: data.user, loading: false });
+        // Clear pending user data
+        set({ user: data.user, pendingGoogleUser: null, loading: false });
         return data.redirectUrl;
       }
 

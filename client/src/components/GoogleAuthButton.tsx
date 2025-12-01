@@ -3,7 +3,6 @@ import { useGoogleAuthStore } from "../store/googleAuthStore";
 import { useNavigate } from "react-router-dom";
 import { useGoogleOAuth } from "../hooks/useGoogleOAuth";
 import type { GoogleAuthResponse } from "../lib/googleOAuth.utils";
-import { storeGoogleIdToken } from "../lib/googleOAuth.utils";
 
 export default function GoogleAuthButton() {
   const { googleLogin, loading } = useGoogleAuthStore();
@@ -14,7 +13,6 @@ export default function GoogleAuthButton() {
 
     try {
       const redirectUrl = await googleLogin(idToken);
-      storeGoogleIdToken(idToken);
       console.log("Google login redirect URL:", redirectUrl);
       if (redirectUrl) {
         // Navigate immediately - authStore is now synced
