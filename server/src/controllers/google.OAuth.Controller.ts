@@ -4,8 +4,7 @@ import User from "../models/user.model";
 import { generateToken } from "../lib/utils";
 import { getDashboardUrl } from "../lib/utils";
 import config from "../config/config";
-import { generateWelcomeEmail } from "../emails/emailTemplate";
-import { sendEmail } from "../emails/emailHandlers";
+import { sendWelcomeEmail } from "../emails/emailerSender";
 
 
 
@@ -31,6 +30,11 @@ export const loginWithGoogle = async (req: Request, res: Response): Promise<void
 
     if (!payload || !payload.email) {
       res.status(400).json({ message: "Invalid Google token" });
+      return;
+    }
+
+    if (!payload.email_verified) {
+      res.status(400).json({ message: "Email not verified by Google" });
       return;
     }
 
@@ -110,44 +114,57 @@ export const completeGoogleSignup = async (req: Request, res: Response): Promise
     const { email, name, picture } = payload;
     const normalizedEmail = email.toLowerCase();
 
-    // Prevent duplicate registration
+    // Duplicate check (UX only)
     const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
       res.status(400).json({ message: "User already exists, please login instead." });
       return;
     }
 
-    // Normalize role to match enum: 'Agent', 'Buyer', 'Admin'
-    const normalizedRole = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
-    if (!['Agent', 'Buyer', 'Admin'].includes(normalizedRole)) {
-      res.status(400).json({ message: "Invalid role. Must be 'Agent', 'Buyer', or 'Admin'" });
+    // Validate and normalize role
+    const normalizedRole =
+      role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+
+    if (!["Agent", "Buyer", "Admin"].includes(normalizedRole)) {
+      res.status(400).json({
+        message: "Invalid role. Must be 'Agent', 'Buyer', or 'Admin'",
+      });
       return;
     }
 
-    // Create new user with chosen role
-    const newUser = await User.create({
-      fullName: name,
-      email: normalizedEmail,
-      password: null, // OAuth user has no password
-      role: normalizedRole,
-      profilePicture: picture || "",
-      authProvider: "google",
-    });
+    let newUser;
 
-    // Generate JWT
+    // Create user — protected against race conditions
+    try {
+      newUser = await User.create({
+        fullName: name,
+        email: normalizedEmail,
+        password: null,
+        role: normalizedRole,
+        profilePicture: picture || "",
+        authProvider: "google",
+      });
+    } catch (err: any) {
+      // MongoDB duplicate key error (e.g., two requests at the same time)
+      if (err.code === 11000) {
+        res.status(400).json({
+          message: "User already exists, please login instead.",
+        });
+        return;
+      }
+      throw err; // Re-throw if it's not a duplicate key error
+    }
+
+    // Generate JWT token (sets cookie and returns token)
     const token = generateToken(String(newUser._id), newUser.role, res);
 
-    const html = generateWelcomeEmail(newUser.fullName, newUser.role);
-      await sendEmail({
-        to: newUser.email,
-        subject: `Welcome to Realtor App, ${newUser.fullName}!`,
-        html,
-      });
+    sendWelcomeEmail(newUser, res);
 
+    // Final response
     res.status(201).json({
       status: "SIGNUP_COMPLETE",
       message: "Signup completed",
-      token, // Return token in response for client-side storage
+      token,
       user: {
         _id: newUser._id,
         fullName: newUser.fullName,
@@ -157,9 +174,11 @@ export const completeGoogleSignup = async (req: Request, res: Response): Promise
       },
       redirectUrl: getDashboardUrl(newUser.role),
     });
-
+    
   } catch (error) {
     console.error("Google Signup Completion Error:", error);
-    res.status(500).json({ message: "Server error during Google signup completion" });
+    res.status(500).json({
+      message: "Server error during Google signup completion",
+    });
   }
 };
