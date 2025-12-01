@@ -47,6 +47,7 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
+        credentials: "include",
       });
 
       if (!res.ok) {
@@ -114,8 +115,9 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           idToken: getGoogleIdToken(),
-          role: pending.role, // Keep capitalized: "Agent" or "Buyer"
+          role: pending.role,
         }),
+        credentials: "include",
       });
 
       const data = await res.json();
