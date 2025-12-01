@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 import { apiConfig } from "../config";
 import type { GoogleAuthResponse } from "../lib/googleOAuth.utils";
 
+
+let checkInterval: ReturnType<typeof setInterval> | null = null;
+let timeoutId: ReturnType<typeof setTimeout> | null = null;
+let isMounted = true;
+
 /**
  * Custom hook to initialize Google OAuth
  * Returns isReady state and a function to trigger sign-in
@@ -38,7 +43,7 @@ export const useGoogleOAuth = (
           });
         }
 
-        setIsReady(true);
+        if (isMounted) setIsReady(true);
       } catch (error) {
         console.error("Failed to initialize Google Sign-In:", error);
       }
@@ -49,9 +54,9 @@ export const useGoogleOAuth = (
       initializeGSI();
     } else {
       // Script might be loading, wait for it or load it
-      const checkInterval = setInterval(() => {
+      checkInterval = setInterval(() => {
         if (window.google?.accounts?.id) {
-          clearInterval(checkInterval);
+          if (checkInterval) clearInterval(checkInterval);
           initializeGSI();
         }
       }, 100);
@@ -66,15 +71,24 @@ export const useGoogleOAuth = (
         script.async = true;
         script.defer = true;
         script.onload = () => {
-          clearInterval(checkInterval);
+          if (checkInterval) clearInterval(checkInterval);
           initializeGSI();
         };
         document.body.appendChild(script);
       }
 
       // Cleanup interval after 5 seconds
-      setTimeout(() => clearInterval(checkInterval), 5000);
+        timeoutId = setTimeout(() => {
+        if (checkInterval) clearInterval(checkInterval);
+      }, 5000);
     }
+
+    return () => {
+      isMounted = false;
+      if (checkInterval) clearInterval(checkInterval);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+
   }, [callback, buttonElementRef]);
 
   const triggerSignIn = () => {
