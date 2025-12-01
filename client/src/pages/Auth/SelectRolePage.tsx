@@ -18,7 +18,11 @@ export default function SelectRolePage() {
   // Redirect to dashboard if user already exists / after signup
   useEffect(() => {
     if (user) {
-      const dashboard = user.role.toLowerCase() === "agent" ? "/dashboard/agent" : "/dashboard/buyer";
+      const roleLower = user.role.toLowerCase();
+      const dashboard = 
+        roleLower === "agent" ? "/dashboard/agent" :
+        roleLower === "buyer" ? "/dashboard/buyer" :
+        "/dashboard/admin";
       navigate(dashboard, { replace: true });
     }
   }, [user, navigate]);
