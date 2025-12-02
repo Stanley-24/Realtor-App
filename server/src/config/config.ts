@@ -15,7 +15,8 @@ interface Config {
   cloud_name: string;
   api_key: string;
   api_secret: string;
-  googleClientId?: string;
+  googleClientId: string;
+  
 }
 
 const config: Config = {
