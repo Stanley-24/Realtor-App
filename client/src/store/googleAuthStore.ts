@@ -158,7 +158,7 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
       return;
     } catch (error) {
       console.error("Google Signup Error:", error);
-      set({ error: "Google Signup failed", loading: false });
+      set({ error: error instanceof Error ? error.message : "Google Signup failed", loading: false });
       return;
     }
   },
