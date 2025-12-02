@@ -1,4 +1,3 @@
-import { generateToken } from "../lib/utils";
 import { sendEmail } from "./emailHandlers";
 import { generateWelcomeEmail } from "./emailTemplate";
 
