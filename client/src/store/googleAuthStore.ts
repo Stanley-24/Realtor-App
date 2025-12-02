@@ -108,9 +108,11 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
       return;
     }
 
-    if (!pending.idToken) {
-      set({ error: "Google ID token missing" });
-      return;
+    const idToken = pending.idToken?.trim();
+    if (!idToken) {
+      const message = "Your Google session expired. Please sign in again.";
+      set({ error: message, loading: false, pendingGoogleUser: null });
+      throw new Error(message);
     }
 
     set({ loading: true, error: null });
@@ -120,7 +122,7 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          idToken: pending.idToken,
+          idToken,
           role: pending.role,
         }),
         credentials: "include",
