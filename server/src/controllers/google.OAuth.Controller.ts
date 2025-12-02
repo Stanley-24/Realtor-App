@@ -125,9 +125,9 @@ export const completeGoogleSignup = async (req: Request, res: Response): Promise
     const normalizedRole =
       role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 
-    if (!["Agent", "Buyer", "Admin"].includes(normalizedRole)) {
+    if (!["Agent", "Buyer"].includes(normalizedRole)) {
       res.status(400).json({
-        message: "Invalid role. Must be 'Agent', 'Buyer', or 'Admin'",
+        message: "Invalid role. Must be 'Agent', or 'Buyer'",
       });
       return;
     }
