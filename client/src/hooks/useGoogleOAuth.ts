@@ -3,10 +3,6 @@ import { apiConfig } from "../config";
 import type { GoogleAuthResponse } from "../lib/googleOAuth.utils";
 
 
-let checkInterval: ReturnType<typeof setInterval> | null = null;
-let timeoutId: ReturnType<typeof setTimeout> | null = null;
-let isMounted = true;
-
 /**
  * Custom hook to initialize Google OAuth
  * Returns isReady state and a function to trigger sign-in
@@ -18,6 +14,10 @@ export const useGoogleOAuth = (
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    let checkInterval: ReturnType<typeof setInterval> | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let isMounted = true;
+    
     const initializeGSI = () => {
       if (!window.google?.accounts?.id) {
         // Script not loaded yet, check again
