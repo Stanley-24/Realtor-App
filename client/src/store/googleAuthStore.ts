@@ -154,11 +154,16 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
   },
 
   setRoleForPendingUser: (role: string) => {
-    set((state) => ({
-      pendingGoogleUser: {
-        ...state.pendingGoogleUser!,
-        role,
-      },
-    }));
+    set((state) => {
+      if (!state.pendingGoogleUser) {
+        return state;
+      }
+      return {
+        pendingGoogleUser: {
+          ...state.pendingGoogleUser,
+          role,
+        },
+      };
+    });
   },
 }));
