@@ -112,7 +112,7 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
     if (!idToken) {
       const message = "Your Google session expired. Please sign in again.";
       set({ error: message, loading: false, pendingGoogleUser: null });
-      throw new Error(message);
+      return;
     }
 
     set({ loading: true, error: null });
