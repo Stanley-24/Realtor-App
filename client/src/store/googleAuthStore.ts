@@ -138,9 +138,19 @@ export const useGoogleAuthStore = create<GoogleAuthState>((set, get) => ({
       if (data.status === "SIGNUP_COMPLETE") {
         // Sync user to authStore - cookie is already set by backend
         syncGoogleUserToAuthStore(data.user);
-        
-        // Clear pending user data
-        set({ user: data.user, pendingGoogleUser: null, loading: false });
+
+        // Clear pending user data and keep a consistent local user shape
+        set({
+          user: {
+            id: data.user._id || data.user.id,
+            fullName: data.user.fullName,
+            email: data.user.email,
+            profilePicture: data.user.profilePicture,
+            role: data.user.role,
+          },
+          pendingGoogleUser: null,
+          loading: false,
+        });
         return data.redirectUrl;
       }
 
