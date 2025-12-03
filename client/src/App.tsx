@@ -8,6 +8,7 @@ import AdminDashboard from './pages/Dashboard/admin'
 import BuyerDashboard from './pages/Dashboard/buyer'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuthStore } from './store/authStore'
+import SelectRolePage from './pages/Auth/SelectRolePage'
 
 function App() {
   const { checkAuth } = useAuthStore();
@@ -22,6 +23,8 @@ function App() {
       <Route path='/' element={< HomePage />} />
       <Route path='/login' element={<LoginPage />} />
       <Route path='/signup' element={<SignupPage />} />
+      <Route path="/select-role" element={<SelectRolePage />} />
+
 
       <Route element={<ProtectedRoute allowedRoles={["admin"]}/> }>
         <Route path='/dashboard/admin' element={<AdminDashboard />} />

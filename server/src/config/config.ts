@@ -15,6 +15,8 @@ interface Config {
   cloud_name: string;
   api_key: string;
   api_secret: string;
+  googleClientId: string;
+  
 }
 
 const config: Config = {
@@ -49,6 +51,9 @@ const config: Config = {
   })(),
   api_secret: process.env.CLOUDINARY_API_SECRET || (() => {
     throw new Error('CLOUDINARY_API_SECRET environment variable is required');
+  })(),
+  googleClientId: process.env.GOOGLE_CLIENT_ID || (() => {
+    throw new Error('GOOGLE_CLIENT_ID environment variable is required');
   })(),
 };
 

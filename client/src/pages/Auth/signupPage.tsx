@@ -4,6 +4,7 @@ import { useAuthStore } from "../../store/authStore";
 import { getDashboardUrl } from "../../lib/utils";
 import img1 from "../../assets/images/images1.png";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import GoogleAuthButton from "../../components/GoogleAuthButton";
 
 export default function SignupPage() {
   const { signup, loading, error, user, initializing } = useAuthStore();
@@ -52,26 +53,27 @@ export default function SignupPage() {
       </div>
       
       {/* RIGHT SIDE FORM */}
-      <div className="flex items-center justify-center p-10 bg-background-blue relative">
+      <div className="flex items-center justify-center p-4 sm:p-6 md:p-10 bg-background-blue relative min-h-screen md:min-h-0">
         {/* BACK BUTTON */}
         <a
           href="/"
-          className="absolute py-8 top-4 left-4 inline-flex items-center text-white font-jetbrain hover:text-gray-200 font-normal"
+          className="absolute top-4 left-4 sm:top-6 sm:left-6 md:top-4 md:left-4 inline-flex items-center text-white font-jetbrain hover:text-gray-200 font-normal text-sm sm:text-base z-10"
         >
           <ArrowLeftIcon className="h-5 w-5 mr-2" />
-          Back to Home
+          <span className="hidden sm:inline">Back to Home</span>
+          <span className="sm:hidden">Back</span>
         </a>
 
-        <div className="w-full max-w-md mt-0 md:mt-0 flex flex-col justify-center h-full">
-          <form onSubmit={handleSignup} className="w-full space-y-6 font-jetbrain font-normal">
-            <h1 className="text-3xl font-bold font-jetbrain text-center md:text-left">
+        <div className="w-full max-w-md mt-8 sm:mt-12 md:mt-0 flex flex-col justify-center h-full">
+          <form onSubmit={handleSignup} className="w-full space-y-4 sm:space-y-6 font-jetbrain font-normal">
+            <h1 className="text-2xl sm:text-3xl font-bold font-jetbrain text-center md:text-left">
               Create a free Account with <span className="text-white cursor-pointer hover:text-gray-400">Us</span>
             </h1>
 
             {error && <p className="text-red-500">{error}</p>}
 
             <input
-              className="input input-bordered w-full bg-white text-gray-800 placeholder-gray-400"
+              className="input input-bordered w-full bg-white text-gray-800 placeholder-gray-400 text-sm sm:text-base"
               placeholder="Full Name"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -80,7 +82,7 @@ export default function SignupPage() {
 
             <input
               type="email"
-              className="input input-bordered w-full bg-white text-gray-800 placeholder-gray-400"
+              className="input input-bordered w-full bg-white text-gray-800 placeholder-gray-400 text-sm sm:text-base"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -89,7 +91,7 @@ export default function SignupPage() {
 
             <input
               type="password"
-              className="input input-bordered w-full bg-white text-gray-800 placeholder-gray-400"
+              className="input input-bordered w-full bg-white text-gray-800 placeholder-gray-400 text-sm sm:text-base"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -97,9 +99,9 @@ export default function SignupPage() {
             />
 
             <div className="flex flex-col gap-3 text-left">
-              <label className="font-medium text-white">Select Role</label>
+              <label className="font-medium text-white text-sm sm:text-base">Select Role</label>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 sm:gap-6">
 
                 {/* Buyer */}
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -112,7 +114,7 @@ export default function SignupPage() {
                     className="radio radio-primary"
                     required={true}
                   />
-                  <span className="text-gray-200">Buyer</span>
+                  <span className="text-gray-200 text-sm sm:text-base">Buyer</span>
                 </label>
 
                 {/* Agent */}
@@ -126,20 +128,20 @@ export default function SignupPage() {
                     className="radio radio-primary"
                     required={true}
                   />
-                  <span className="text-gray-200">Agent</span>
+                  <span className="text-gray-200 text-sm sm:text-base">Agent</span>
                 </label>
 
               </div>
             </div>
 
             <button
-              className="bg-btn-colors px-5 py-2 rounded-full hover:bg-secondary-blue/80 transition w-full text-white text-base"
+              className="bg-btn-colors px-5 py-2.5 sm:py-3 rounded-full hover:bg-secondary-blue/80 transition w-full text-white text-sm sm:text-base font-jetbrain"
               disabled={loading}
             >
               {loading ? "Creating..." : "Sign Up"}
             </button>
 
-            <p className="text-sm text-center text-gray-200">
+            <p className="text-xs sm:text-sm text-center text-gray-200">
               Already have an account?{" "}
               <a
                 href="/login"
@@ -149,6 +151,14 @@ export default function SignupPage() {
               </a>
             </p>
           </form>
+
+          <div className="my-4 flex items-center gap-3">
+            <div className="flex-grow h-[1px] bg-gray-400" />
+            <span className="text-white text-xs sm:text-sm">or</span>
+            <div className="flex-grow h-[1px] bg-gray-400" />
+          </div>
+
+          <GoogleAuthButton/>
         </div>
       </div>
     </div>
