@@ -11,7 +11,7 @@ jest.mock("../lib/utils.ts", () => ({
     // Create a real JWT
     const token = jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: "7d" });
     // Set cookie
-    res.cookie("token", token, { httpOnly: true, sameSite: "Strict" });
+    res.cookie("jwt", token, { httpOnly: true, sameSite: "Strict" });
 
     return token;
   }),
