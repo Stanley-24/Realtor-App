@@ -11,24 +11,40 @@ export interface AuthRequest extends Request {
 export const protectRoutes = async (req: AuthRequest, res: Response, next: NextFunction) => {
   let token: string | undefined;
 
-  // --- 1️⃣ Check Authorization header (case-insensitive) ---
+  // --- 1️⃣ Check Authorization header ---
   const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.toLowerCase().startsWith("bearer")) {
-    const parts = authHeader.split(" ");
-    if (parts.length === 2 && parts[1].trim() !== "") {
-      token = parts[1].trim();
-    } else {
+  if (authHeader) {
+    if (!authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ message: "Invalid authorization header format" });
     }
+
+    const tokenPart = authHeader.split(" ")[1];
+    if (!tokenPart || !tokenPart.trim()) {
+      return res.status(401).json({ message: "Invalid authorization header format" });
+    }
+
+    token = tokenPart.trim();
   }
 
   // --- 2️⃣ If no header token, check cookie ---
   if (!token && req.cookies?.jwt) {
-    token = req.cookies.jwt.trim();
+    const cookieToken = req.cookies.jwt.trim();
+    if (cookieToken) {
+      token = cookieToken;
+    }
   }
 
   // --- 3️⃣ Reject if still no token ---
+  // Ensure token is a non-empty string
   if (!token) {
+    return res.status(401).json({ message: "Not authorized, token missing" });
+  }
+  
+  // Final trim to ensure clean token
+  token = token.trim();
+  
+  // Reject if token is empty after trimming
+  if (token.length === 0) {
     return res.status(401).json({ message: "Not authorized, token missing" });
   }
 
