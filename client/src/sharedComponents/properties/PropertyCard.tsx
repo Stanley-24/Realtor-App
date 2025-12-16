@@ -87,7 +87,7 @@ export default function PropertyCard({ p }: { p: Property }) {
           {p.bedrooms} Beds • {p.bathrooms} Baths • {p.squareFootage} sqft
         </p>
         <p className="font-bold text-3xl font-head md:text-2xl text-white mt-auto">
-          ₦{p.price.toLocaleString()}
+          {p.price.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' })}
         </p>
       </div>
 
