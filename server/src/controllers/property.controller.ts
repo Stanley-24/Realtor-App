@@ -22,6 +22,12 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
   let session: mongoose.ClientSession | null = null;
 
   try {
+
+    // Ensure authenticated user
+    if (!req.user?._id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
     // Trim and validate required string fields
     const title = req.body.title?.trim();
     const description = req.body.description?.trim();
@@ -64,10 +70,7 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
       return res.status(400).json({ message: "Square footage must be a positive number" });
     }
 
-    // Ensure authenticated user
-    if (!req.user?._id) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
+
 
     // Start MongoDB session
     session = await mongoose.startSession();
@@ -143,7 +146,9 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
     // Rollback changes if anything fails
     if (session) await session.abortTransaction();
 
-    return res.status(500).json({ message: "Server error creating property" });
+    return res.status(500).json({
+      message: "Server error creating property"
+    });
   } finally {
     // Clean up the session
     if (session) session.endSession();
@@ -173,7 +178,11 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
 
     // --- Filters ---
     if (location) {
-      const escaped = (location as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // escape regex
+     if ((location as string).length > 50) {
+       res.status(400).json({ success: false, message: "Location query too long" });
+       return;
+     }
+      const escaped = (location as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       filter.location = { $regex: new RegExp(escaped, "i") };
     }
 
@@ -258,9 +267,13 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
     const total = await Property.countDocuments(filter);
 
     if (!properties.length) {
-      res.status(404).json({
-        success: false,
-        message: "No properties found matching your criteria",
+      res.status(200).json({
+        success: true,
+        total,
+        page: pageNumber,
+        limit: pageSize,
+        count: 0,
+        data: [],
       });
       return;
     }
@@ -316,7 +329,8 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    const { type, status, minPrice, maxPrice, sort, page = 1, limit = 10 } = req.query;
+    const { type, status, minPrice, maxPrice, sort, page = 1, limit = 10, location } = req.query;
+
 
     // Base query: only properties owned by the logged-in Agent
     const baseQuery: FilterQuery<IProperty> = { agent: req.user._id };
@@ -346,6 +360,16 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
      }
      query.status = status;
    }
+
+    if (location) {
+     if ((location as string).length > 50) {
+       res.status(400).json({ success: false, message: "Location query too long" });
+       return;
+     }
+      const escaped = (location as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      query.location = { $regex: new RegExp(escaped, "i") };
+    }
+
 
     // --- Price filter with validation ---
     const min = Number(minPrice);
