@@ -175,11 +175,16 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
     } = req.query;
 
     const filter: FilterQuery<IProperty> = {};
+    const query: FilterQuery<IProperty> = { ...filter };
 
     // --- Filters ---
     if (location) {
-      const escaped = (location as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // escape regex
-      filter.location = { $regex: new RegExp(escaped, "i") };
+     if ((location as string).length > 50) {
+       res.status(400).json({ success: false, message: "Location query too long" });
+       return;
+     }
+      const escaped = (location as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      query.location = { $regex: new RegExp(escaped, "i") };
     }
 
     const validTypes = ['House', 'Apartment', 'Land', 'Commercial', 'Other'];
@@ -357,8 +362,12 @@ export const getMyListings = async (req: AuthRequest, res: Response): Promise<vo
      query.status = status;
    }
 
-   if (location) {
-      const escaped = (location as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // escape regex
+    if (location) {
+     if ((location as string).length > 50) {
+       res.status(400).json({ success: false, message: "Location query too long" });
+       return;
+     }
+      const escaped = (location as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       query.location = { $regex: new RegExp(escaped, "i") };
     }
 
