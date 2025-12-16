@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import logoWhite from "../assets/logo/logo-white.png";
-import logoBlack from "../assets/logo/logo-black.png";
+import logoWhite from "../assets/logo/logo4.png";
+import logoBlack from "../assets/logo/logo3.png";
 export default function LogoWhite() {
   return (
     <Link to="/" className="flex items-center">

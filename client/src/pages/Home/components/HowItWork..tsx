@@ -65,19 +65,19 @@ export default function HowItWorks() {
               whileInView={{ height: "calc(100% + 1.5rem)" }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
-              className="absolute left-5 top-12 w-1 bg-gradient-to-b from-secondary-blue/70 to-transparent"
+              className="absolute left-5 top-12 w-1 bg-gradient-to-b from-pinky/70 to-transparent"
             />
           )}
 
           {/* Step Number */}
           <motion.div
             whileHover={{ scale: 1.2 }}
-            className="relative z-10 flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-btn-colors font-bold text-white text-lg"
+            className="relative z-10 flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-pinky font-bold text-white text-lg"
           >
             {index + 1}
             <motion.div
-              whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.4)" }}
-              className="absolute -inset-2 rounded-full bg-btn-colors/20 z-[-1]"
+              whileHover={{ backgroundColor: "rgba(var(--pinky-rgb), 0.4)" }}
+              className="absolute -inset-2 rounded-full bg-pinky/20 z-[-1]"
             />
           </motion.div>
 
@@ -87,17 +87,17 @@ export default function HowItWorks() {
               whileHover={{ scale: 1.05 }}
               className="flex items-center gap-2 mb-2 group"
             >
-              <Icon className="w-6 h-6 text-primary-blue transition-colors duration-300 group-hover:text-btn-colors" />
-              <h4 className="font-semibold text-lg font-head">{step.title}</h4>
+              <Icon className="w-6 h-6 text-light-blue transition-colors duration-300 group-hover:text-btn-colors" />
+              <h4 className="font-bold text-lg font-jetbrain">{step.title}</h4>
             </motion.div>
-            <p className="text-gray-=500 font-normal font-jetbrain text-sm">{step.description}</p>
+            <p className="text-gray-500 font-normal font-nunito text-base">{step.description}</p>
           </div>
         </motion.div>
       );
     });
 
   return (
-    <section className="py-16 bg-primary-blue">
+    <section className="py-16 bg-lighty">
       <div className="max-w-7xl mx-auto px-6 text-center">
         <h2 className="text-3xl font-bold font-head text-white mb-4">How Rental Wave Works</h2>
         <p className="text-gray-200 font-jetbrain mb-12">
