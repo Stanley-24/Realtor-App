@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 
 let mongo: MongoMemoryReplSet;
-
+let consoleErrorSpy: jest.SpyInstance;
 /**
  * Initialize in-memory MongoDB replica set for tests
  */
 export const startMongoMemoryReplSet = async () => {
   jest.setTimeout(60000); // 60s timeout for slow startup
-  jest.spyOn(console, "error").mockImplementation(() => {});
+  consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
   // Close existing connections if any
   if (mongoose.connection.readyState !== 0) {
@@ -40,6 +40,7 @@ export const clearDatabase = async () => {
  * Stop the in-memory MongoDB
  */
 export const stopMongoMemoryReplSet = async () => {
+  if (consoleErrorSpy) consoleErrorSpy.mockRestore();
   if (mongoose.connection.readyState !== 0) {
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close(true);
