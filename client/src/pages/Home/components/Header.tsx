@@ -138,7 +138,7 @@ export default function Header() {
               <hr className="my-1" />
 
               <Link
-                to="/login"
+                to="/signup"
                 className="bg-blue-gradient text-white px-5 py-2 rounded-full text-center hover:bg-dark-gradient-hover transition"
                 onClick={() => setOpen(false)}
               >
