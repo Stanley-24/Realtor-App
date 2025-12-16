@@ -139,7 +139,7 @@ export default function Header() {
 
               <Link
                 to="/login"
-                className="bg-btn-colors text-white px-5 py-2 rounded-full text-center hover:bg-secondary-blue/80 transition"
+                className="bg-blue-gradient text-white px-5 py-2 rounded-full text-center hover:bg-dark-gradient-hover transition"
                 onClick={() => setOpen(false)}
               >
                 Get Started
