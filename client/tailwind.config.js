@@ -13,6 +13,7 @@ module.exports = {
       "secondary-blue": "#443AC5",
       "background-blue": "#3976C5",
       "btn-colors": "#3ABCC5",
+      "light-blue": "#398EC5",
       
     },
     backgroundImage: {
