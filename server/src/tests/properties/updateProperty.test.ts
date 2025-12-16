@@ -139,7 +139,7 @@ describe("updateProperty", () => {
   });
 
   it("returns 500 if database throws error", async () => {
-    jest.spyOn(Property.prototype, "save").mockImplementationOnce(() => { throw new Error("DB failure"); });
+    jest.spyOn(Property.prototype, "save").mockRejectedValueOnce(new Error("DB failure"));
     const req = mockRequest({ params: { id: properties[0]._id }, user: { _id: agent._id } });
     const res = mockResponse();
     await updateProperty(req, res);
