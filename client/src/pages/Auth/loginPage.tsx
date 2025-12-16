@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, Link, Navigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { getDashboardUrl } from "../../lib/utils";
-import img1 from "../../assets/images/images1.png";
+import img1 from "../../assets/images/images4.jpeg";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import GoogleAuthButton from "../../sharedComponents/GoogleAuthButton";
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen grid md:grid-cols-2">
-      <div className="hidden md:block bg-btn-colors/60">
+      <div className="hidden md:block bg-light-blue/90">
         <div className="h-full overflow-hidden rounded-l-lg bg-background-blue shadow-lg rounded-full">
           <img
             src={img1}
@@ -63,7 +63,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md mt-8 sm:mt-12 md:mt-0">
           <form onSubmit={handleLogin} className="w-full space-y-4 sm:space-y-6">
             <h1 className="text-2xl sm:text-3xl font-bold font-jetbrain text-center md:text-left">
-              Welcome Back to <span className="text-btn-colors cursor-pointer hover:text-white">Rental Wave</span>
+              Welcome Back to <span className="text-white cursor-pointer">Rental Wave</span>
             </h1>
 
             {error && <p className="text-red-500 text-sm sm:text-base">{error}</p>}
@@ -87,7 +87,7 @@ export default function LoginPage() {
             />
 
             <button 
-              className="bg-btn-colors px-5 py-2.5 sm:py-3 rounded-full font-jetbrain hover:bg-secondary-blue/80 transition w-full text-white text-sm sm:text-base" 
+              className="bg-pinky px-5 py-2.5 sm:py-3 rounded-full font-bold font-jetbrain hover:bg-blue-gradient transition w-full text-white text-mm sm:text-base" 
               disabled={loading}
             >
               {loading ? "Processing..." : "Login"}
@@ -105,9 +105,9 @@ export default function LoginPage() {
           </form>
 
           <div className="my-4 flex items-center gap-3">
-            <div className="flex-grow h-[1px] bg-gray-400" />
+            <div className="flex-grow h-[1px] bg-pinky" />
             <span className="text-white text-xs sm:text-sm">or</span>
-            <div className="flex-grow h-[1px] bg-gray-400" />
+            <div className="flex-grow h-[1px] bg-pinky" />
           </div>
 
           <GoogleAuthButton />
