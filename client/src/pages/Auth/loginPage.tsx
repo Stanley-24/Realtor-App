@@ -87,7 +87,7 @@ export default function LoginPage() {
             />
 
             <button 
-              className="bg-pinky px-5 py-2.5 sm:py-3 rounded-full font-bold font-jetbrain hover:bg-blue-gradient transition w-full text-white text-mm sm:text-base" 
+              className="bg-pinky px-5 py-2.5 sm:py-3 rounded-full font-bold font-jetbrain hover:bg-blue-gradient transition w-full text-white text-base sm:text-base" 
               disabled={loading}
             >
               {loading ? "Processing..." : "Login"}
