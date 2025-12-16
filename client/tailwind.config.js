@@ -14,6 +14,7 @@ module.exports = {
       "background-blue": "#3976C5",
       "btn-colors": "#3ABCC5",
       "light-blue": "#398EC5",
+      "lighty": "#74b0d7"
       
     },
     backgroundImage: {
