@@ -4,8 +4,8 @@ import User from "../../models/user.model";
 import { createProperty } from "../../controllers/property.controller";
 
 // Mock Cloudinary
-export const mockUploadImages = jest.fn();
-export const mockDeleteImage = jest.fn();
+const mockUploadImages = jest.fn();
+const mockDeleteImage = jest.fn();
 
 jest.mock("../../lib/cloudinary", () => ({
   uploadMultipleImagesToCloudinary: (...args: any[]) => mockUploadImages(...args),
