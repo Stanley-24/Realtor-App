@@ -1,8 +1,10 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types,  } from 'mongoose';
+import mongoose from 'mongoose';
 
 export type UserRole = 'Agent' | 'Buyer' | 'Admin';
 
 export interface IUser extends Document {
+  _id: mongoose.Types.ObjectId;
   fullName: string;
   email: string;
   password?: string;
