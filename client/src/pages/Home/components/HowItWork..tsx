@@ -76,7 +76,7 @@ export default function HowItWorks() {
           >
             {index + 1}
             <motion.div
-              whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.4)" }}
+              whileHover={{ backgroundColor: "rgba(var(--pinky-rgb), 0.4)" }}
               className="absolute -inset-2 rounded-full bg-pinky/20 z-[-1]"
             />
           </motion.div>
