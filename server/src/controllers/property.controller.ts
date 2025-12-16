@@ -175,7 +175,6 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
     } = req.query;
 
     const filter: FilterQuery<IProperty> = {};
-    const query: FilterQuery<IProperty> = { ...filter };
 
     // --- Filters ---
     if (location) {
@@ -184,7 +183,7 @@ export const getAllProperties = async (req: Request, res: Response): Promise<voi
        return;
      }
       const escaped = (location as string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      query.location = { $regex: new RegExp(escaped, "i") };
+      filter.location = { $regex: new RegExp(escaped, "i") };
     }
 
     const validTypes = ['House', 'Apartment', 'Land', 'Commercial', 'Other'];
