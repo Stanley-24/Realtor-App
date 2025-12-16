@@ -62,7 +62,7 @@ export default function Header() {
   
           <Link 
             to="/signup" 
-            className="bg-blue-gradient
+            className="bg-pinky
             hover:bg-dark-gradient-hover
             text-white
             px-7

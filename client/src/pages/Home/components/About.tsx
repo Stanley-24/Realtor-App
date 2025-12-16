@@ -46,7 +46,7 @@ export default function About() {
             to="/signup"
             className="
               inline-flex items-center justify-center
-              bg-btn-colors         
+              bg-pinky         
               hover:bg-white
               hover:text-gray-700
               text-white

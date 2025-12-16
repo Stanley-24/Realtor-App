@@ -67,7 +67,7 @@ export default function Hero() {
        <Link
         to="/signup"
         className="
-          bg-blue-gradient
+          bg-pinky
           hover:bg-dark-gradient-hover
           text-white
           px-8               

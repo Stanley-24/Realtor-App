@@ -65,19 +65,19 @@ export default function HowItWorks() {
               whileInView={{ height: "calc(100% + 1.5rem)" }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
-              className="absolute left-5 top-12 w-1 bg-gradient-to-b from-secondary-blue/70 to-transparent"
+              className="absolute left-5 top-12 w-1 bg-gradient-to-b from-pinky/70 to-transparent"
             />
           )}
 
           {/* Step Number */}
           <motion.div
             whileHover={{ scale: 1.2 }}
-            className="relative z-10 flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-btn-colors font-bold text-white text-lg"
+            className="relative z-10 flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-pinky font-bold text-white text-lg"
           >
             {index + 1}
             <motion.div
               whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.4)" }}
-              className="absolute -inset-2 rounded-full bg-btn-colors/20 z-[-1]"
+              className="absolute -inset-2 rounded-full bg-pinky/20 z-[-1]"
             />
           </motion.div>
 

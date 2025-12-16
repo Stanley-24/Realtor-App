@@ -36,7 +36,7 @@ export default function PropertyCard({ p }: { p: Property }) {
               <>
                 <button
                   onClick={prevImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-primary-blue/90 text-white w-12 h-12 rounded-full hover:bg-secondary-blue flex items-center justify-center text-2xl backdrop-blur-sm shadow-lg z-20 transition-all hover:scale-110"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-pinky/90 text-white w-12 h-12 rounded-full hover:bg-secondary-blue flex items-center justify-center text-2xl backdrop-blur-sm shadow-lg z-20 transition-all hover:scale-110"
                   aria-label="Previous image"
                 >
                   ❮
@@ -44,7 +44,7 @@ export default function PropertyCard({ p }: { p: Property }) {
 
                 <button
                   onClick={nextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-primary-blue/90 text-white w-12 h-12 rounded-full hover:bg-secondary-blue flex items-center justify-center text-2xl backdrop-blur-sm shadow-lg z-20 transition-all hover:scale-110"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-pinky/90 text-white w-12 h-12 rounded-full hover:bg-secondary-blue flex items-center justify-center text-2xl backdrop-blur-sm shadow-lg z-20 transition-all hover:scale-110"
                   aria-label="Next image"
                 >
                   ❯
