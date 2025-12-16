@@ -44,7 +44,7 @@ export default function ProductGrid() {
     );
   }
 
-  // Responsively show 6 items on mobile, 9 on desktop
+  // Responsively show 10 items on mobile, 18 on desktop
   const displayedProducts = products.slice(0, isMobile ? 10 : 18);
 
   return (
