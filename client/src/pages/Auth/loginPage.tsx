@@ -4,7 +4,7 @@ import { useAuthStore } from "../../store/authStore";
 import { getDashboardUrl } from "../../lib/utils";
 import img1 from "../../assets/images/images1.png";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import GoogleAuthButton from "../../components/GoogleAuthButton";
+import GoogleAuthButton from "../../sharedComponents/GoogleAuthButton";
 
 export default function LoginPage() {
   const { login, loading, error, user, initializing } = useAuthStore();

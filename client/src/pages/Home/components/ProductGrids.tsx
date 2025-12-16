@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useProductStore } from "../../../store/productStore";
 import type { Property } from "../../../store/productStore";
-import PropertyCard from "../../../components/properties/PropertyCard";
+import PropertyCard from "../../../sharedComponents/properties/PropertyCard";
 
 
 export default function ProductGrid() {
