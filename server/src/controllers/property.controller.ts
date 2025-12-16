@@ -147,8 +147,7 @@ export const createProperty = async (req: AuthRequest, res: Response): Promise<R
     if (session) await session.abortTransaction();
 
     return res.status(500).json({
-      message: "Server error creating property",
-      error: error instanceof Error ? error.message : error
+      message: "Server error creating property"
     });
   } finally {
     // Clean up the session
