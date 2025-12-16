@@ -90,7 +90,7 @@ export default function HowItWorks() {
               <Icon className="w-6 h-6 text-light-blue transition-colors duration-300 group-hover:text-btn-colors" />
               <h4 className="font-bold text-lg font-jetbrain">{step.title}</h4>
             </motion.div>
-            <p className="text-gray-500 font-normal font-nunito text-md">{step.description}</p>
+            <p className="text-gray-500 font-normal font-nunito text-base">{step.description}</p>
           </div>
         </motion.div>
       );
