@@ -1,9 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProductStore } from "../../../store/productStore";
 import type { Property } from "../../../store/productStore";
 import PropertyCard from "../../../sharedComponents/properties/PropertyCard";
 
+// Custom hook to detect mobile screen size (safe for SSR and reactive)
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Initial check (only runs client-side)
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+
+    checkMobile(); // Run once on mount
+
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  return isMobile;
+}
+
 export default function ProductGrid() {
+  const isMobile = useIsMobile();
   const { products, fetchProducts, loading, error } = useProductStore();
 
   useEffect(() => {
@@ -26,8 +44,8 @@ export default function ProductGrid() {
     );
   }
 
-  // Show 6 on mobile, 9 on desktop
-  const displayedProducts = products.slice(0, window.innerWidth < 768 ? 6 : 9);
+  // Responsively show 6 items on mobile, 9 on desktop
+  const displayedProducts = products.slice(0, isMobile ? 10 : 18);
 
   return (
     <section className="bg-gray-200 py-12 px-4 md:px-8">
