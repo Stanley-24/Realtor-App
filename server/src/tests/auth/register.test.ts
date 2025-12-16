@@ -24,7 +24,7 @@ describe("POST /api/v1/auth/signup", () => {
     // ✅ Check that the cookie is set
     const cookies = res.headers["set-cookie"];
     expect(cookies).toBeDefined();
-    expect(cookies[0]).toMatch(/token=/);       // Any token
+    expect(cookies[0]).toMatch(/jwt=/);       // Any token
     expect(cookies[0]).toMatch(/HttpOnly/);
     expect(cookies[0]).toMatch(/Path=\//);
     expect(cookies[0]).toMatch(/SameSite=Strict/); // Only if you set it in generateToken
