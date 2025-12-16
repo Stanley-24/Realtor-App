@@ -72,7 +72,7 @@ export default function Hero() {
           text-white
           px-8               
           py-4               
-          w-50              
+          w-52              
           mt-8
           transition-all 
           duration-500 
