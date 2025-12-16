@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import LogoWhite from "../../../components/Logo";
+import LogoWhite from "../../../sharedComponents/Logo";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -62,7 +62,23 @@ export default function Header() {
   
           <Link 
             to="/signup" 
-            className="bg-btn-colors text-white px-5 py-2 rounded-full hover:bg-secondary-blue/80 transition"
+            className="bg-blue-gradient
+            hover:bg-dark-gradient-hover
+            text-white
+            px-7
+            py-3
+            rounded-full
+            text-center
+            font-semibold
+            text-base
+            hover:shadow-cyan-500/20
+            hover:scale-105
+            transition-all
+            duration-500 
+            ease-out
+        
+
+            "
           >
             Get Started
           </Link>
