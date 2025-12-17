@@ -1,7 +1,9 @@
 // src/config/redis.ts
 import Redis from 'ioredis';
 
-const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  enableOfflineQueue: false,
+});
 
 redisClient.on('error', (err) => {
   console.error('Redis connection error:', err);
