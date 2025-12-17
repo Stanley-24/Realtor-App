@@ -1,6 +1,6 @@
 // src/middlewares/rateLimiterAuth.ts
 import rateLimit from 'express-rate-limit';
-import RateLimiterRedis  from 'rate-limit-redis';
+import RateLimiterRedis, { RedisReply }  from 'rate-limit-redis';
 import redisClient from '../config/redis';
 import type { Request } from 'express';
 
@@ -14,8 +14,10 @@ const getIp = (req: Request): string => {
 // Create SEPARATE stores with unique prefixes
 const createRedisStore = (prefix: string) =>
   new RateLimiterRedis({
-    // @ts-ignore - known type issue with ioredis
-    sendCommand: (...args: string[]) => redisClient.call(...args),
+   
+    sendCommand: (command: string, ...args: string[]): Promise<RedisReply> => {
+      return redisClient.call(command, ...args) as Promise<RedisReply>;
+    },
     prefix,
   });
 
