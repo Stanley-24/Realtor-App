@@ -22,4 +22,18 @@ redisClient.on('reconnecting', () => {
   console.log('Redis reconnecting...');
 });
 
+// Graceful shutdown
+
+process.on('SIGINT', async () => {
+  console.log('Closing Redis connection...');
+  await redisClient.quit();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('Closing Redis connection...');
+  await redisClient.quit();
+  process.exit(0);
+});
+
 export default redisClient;
