@@ -1,4 +1,4 @@
-import { LogoBlack } from "../../../components/Logo";
+import { LogoBlack } from "../../../sharedComponents/Logo";
 export default function ContactForm() {
   return (
     <div id="contact" className="bg-black/85 text0-white py-12 px-6 md:px-14 flex flex-col md:flex-row items-center md:items-center justify-center md:justify-between gap-8">
@@ -12,7 +12,7 @@ export default function ContactForm() {
           <input type="email" placeholder="Your email" className="input input-bordered w-full cursor-text hover:bg-btn-colors/30" />
           <textarea placeholder="Your message" className="textarea textarea-bordered w-full cursor-text hover:bg-btn-colors/30"></textarea>
           <button 
-            className=" bg-btn-colors opacity-70 text-white px-4 py-2 sm:px-6 sm:py-3 
+            className=" bg-pinky opacity-90 text-white px-4 py-2 sm:px-6 sm:py-3 
             mt-5 sm:mt-6 rounded-full hover:bg-secondary-blue/80 transition 
             font-semibold shadow-lg text-sm sm:text-base">
               Send message

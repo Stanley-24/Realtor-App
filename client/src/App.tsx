@@ -6,7 +6,7 @@ import SignupPage from './pages/Auth/signupPage'
 import AgentDashboard from './pages/Dashboard/agent'
 import AdminDashboard from './pages/Dashboard/admin'
 import BuyerDashboard from './pages/Dashboard/buyer'
-import ProtectedRoute from './components/ProtectedRoute'
+import ProtectedRoute from './sharedComponents/ProtectedRoute'
 import { useAuthStore } from './store/authStore'
 import SelectRolePage from './pages/Auth/SelectRolePage'
 

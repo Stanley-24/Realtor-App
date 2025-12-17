@@ -1,5 +1,7 @@
 import { sendEmail } from "./emailHandlers";
 import { generateWelcomeEmail } from "./emailTemplate";
+import { generatePasswordResetEmail} from "./resetPassTemp"
+import { EmailResult } from "../types/email.types";
 
 export async function sendWelcomeEmail(newUser: any, res: any) {
 
@@ -8,7 +10,7 @@ export async function sendWelcomeEmail(newUser: any, res: any) {
     const html = generateWelcomeEmail(newUser.fullName, newUser.role);
     await sendEmail({
       to: newUser.email,
-      subject: `Welcome to Realtor App, ${newUser.fullName}!`,
+      subject: `Welcome to Rental Wave, ${newUser.fullName}!`,
       html,
     });
   } catch (emailError) {
@@ -16,3 +18,28 @@ export async function sendWelcomeEmail(newUser: any, res: any) {
     // Continue with signup completion despite email failure
   }
 }
+
+
+
+
+
+export const sendPasswordResetEmailService = async (
+  email: string,
+  fullName: string,
+  resetUrl: string
+): Promise<EmailResult>  => {
+  try {
+    const html = generatePasswordResetEmail(fullName, resetUrl);
+
+    const result = await sendEmail({
+      to: email,
+      subject: "Reset Your Rental Wave Password",
+      html,
+    });
+
+    return result; // { success: true, data } or { success: false, error }
+  } catch (emailError) {
+    console.error("Failed to send password reset email:", emailError);
+    return { success: false, error: emailError };
+  }
+};

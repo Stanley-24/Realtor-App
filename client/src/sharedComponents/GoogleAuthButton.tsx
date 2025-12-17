@@ -49,7 +49,7 @@ export default function GoogleAuthButton() {
         onClick={handleGoogleSignIn}
         disabled={loading || !isReady}
         className="
-          w-full bg-white hover:bg-secondary-blue
+          w-full bg-white hover:bg-pinky
           text-gray-700 font-head font-semibold py-3 
           px-4 rounded-full border-2 border-primary-blue-500
           hover:border-gray-100 hover:text-white transition-all 

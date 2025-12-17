@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import Container from "../../components/Container"
+import Container from "../../sharedComponents/Container"
 import About from "./components/About"
 import Copyright from "./components/Copyright"
 import ContactForm from "./components/Footer"

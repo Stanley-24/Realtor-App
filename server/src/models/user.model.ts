@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { IUser, UserRole } from '../types/User.types';
+import { generatePasswordResetToken } from '../lib/crypto';
 
 const UserSchema = new Schema<IUser>(
   {
@@ -58,7 +59,16 @@ const UserSchema = new Schema<IUser>(
         ref: 'Chat', // Will be connected to Chat model
       },
     ],
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+    resetPasswordExpires: {
+      type: Date,
+      select: false,
+    },
   },
+
   {
     timestamps: true,
   }
@@ -85,6 +95,17 @@ UserSchema.methods.matchPassword = async function (enteredPassword: string) {
     );
   }
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+
+// Generate and hash reset token
+UserSchema.methods.generatePasswordResetToken = function (): string {
+  const { token, hashedToken, expires } = generatePasswordResetToken();
+
+  this.resetPasswordToken = hashedToken;
+  this.resetPasswordExpires = expires;
+
+  return token; // Return plain token for email
 };
 
 const User = model<IUser>('User', UserSchema);

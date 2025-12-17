@@ -2,9 +2,9 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { getDashboardUrl } from "../../lib/utils";
-import img1 from "../../assets/images/images1.png";
+import img1 from "../../assets/images/images4.jpeg";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import GoogleAuthButton from "../../components/GoogleAuthButton";
+import GoogleAuthButton from "../../sharedComponents/GoogleAuthButton";
 
 export default function SignupPage() {
   const { signup, loading, error, user, initializing } = useAuthStore();
@@ -41,7 +41,7 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen grid md:grid-cols-2">
       {/* LEFT IMAGE */}
-       <div className="hidden md:block bg-btn-colors/60">
+       <div className="hidden md:block bg-light-blue/90">
         <div className="h-full overflow-hidden rounded-l-lg bg-background-blue shadow-lg rounded-full">
           <img
             src={img1}
@@ -67,7 +67,7 @@ export default function SignupPage() {
         <div className="w-full max-w-md mt-8 sm:mt-12 md:mt-0 flex flex-col justify-center h-full">
           <form onSubmit={handleSignup} className="w-full space-y-4 sm:space-y-6 font-jetbrain font-normal">
             <h1 className="text-2xl sm:text-3xl font-bold font-jetbrain text-center md:text-left">
-              Create a free Account with <span className="text-white cursor-pointer hover:text-gray-400">Us</span>
+              Create a free Account with <span className="text-white cursor-pointer">Us</span>
             </h1>
 
             {error && <p className="text-red-500">{error}</p>}
@@ -111,7 +111,7 @@ export default function SignupPage() {
                     value="Buyer"
                     checked={role === "Buyer"}
                     onChange={(e) => setRole(e.target.value)}
-                    className="radio radio-primary"
+                    className="radio radio-primary bg-white"
                     required={true}
                   />
                   <span className="text-gray-200 text-sm sm:text-base">Buyer</span>
@@ -125,7 +125,7 @@ export default function SignupPage() {
                     value="Agent"
                     checked={role === "Agent"}
                     onChange={(e) => setRole(e.target.value)}
-                    className="radio radio-primary"
+                    className="radio radio-primary bg-white"
                     required={true}
                   />
                   <span className="text-gray-200 text-sm sm:text-base">Agent</span>
@@ -135,7 +135,16 @@ export default function SignupPage() {
             </div>
 
             <button
-              className="bg-btn-colors px-5 py-2.5 sm:py-3 rounded-full hover:bg-secondary-blue/80 transition w-full text-white text-sm sm:text-base font-jetbrain"
+              className="bg-pinky px-5 
+              py-2.5 sm:py-3 
+              rounded-full 
+              hover:bg-blue-gradient 
+              transition w-full 
+              text-white 
+              text-md 
+              font-bold 
+              sm:text-base 
+              font-nunito"
               disabled={loading}
             >
               {loading ? "Creating..." : "Sign Up"}
@@ -153,9 +162,9 @@ export default function SignupPage() {
           </form>
 
           <div className="my-4 flex items-center gap-3">
-            <div className="flex-grow h-[1px] bg-gray-400" />
+            <div className="flex-grow h-[1px] bg-pinky" />
             <span className="text-white text-xs sm:text-sm">or</span>
-            <div className="flex-grow h-[1px] bg-gray-400" />
+            <div className="flex-grow h-[1px] bg-pinky" />
           </div>
 
           <GoogleAuthButton/>
