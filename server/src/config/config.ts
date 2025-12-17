@@ -17,6 +17,7 @@ interface Config {
   api_key: string;
   api_secret: string;
   googleClientId: string;
+  ICON_URL: string;
   
 }
 
@@ -58,6 +59,9 @@ const config: Config = {
   })(),
   VITE_CLIENT_URL: process.env.VITE_CLIENT_URL || (() => {
     throw new Error('VITE_CLIENT_URL environment variable is required');
+  })(),
+  ICON_URL: process.env.ICON_URL || (() => {
+    throw new Error('ICON_URL environment variable is required');
   })(),
 }
 export default config;

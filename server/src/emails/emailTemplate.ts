@@ -3,7 +3,7 @@ import config from "../config/config";
 export const generateWelcomeEmail = (fullName: string, role: string) => {
 
   const APP_NAME = config.NAME
-  const ICON_URL = "https://pbs.twimg.com/media/G8TuzLlWcAArhIK?format=png&name=small"
+  const ICON_URL = config.ICON_URL;
   const VITE_CLIENT_URL = config.VITE_CLIENT_URL || "https://realtor-app-mcoo.onrender.com";
 
 
