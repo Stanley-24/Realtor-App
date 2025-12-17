@@ -11,6 +11,7 @@ interface Config {
   EMAIL_FROM: string;
   EMAIL_TO: string;
   CLIENT_URL: string;
+  VITE_CLIENT_URL: string;
   NAME: string;
   cloud_name: string;
   api_key: string;
@@ -55,6 +56,8 @@ const config: Config = {
   googleClientId: process.env.GOOGLE_CLIENT_ID || (() => {
     throw new Error('GOOGLE_CLIENT_ID environment variable is required');
   })(),
-};
-
+  VITE_CLIENT_URL: process.env.VITE_CLIENT_URL || (() => {
+    throw new Error('VITE_CLIENT_URL environment variable is required');
+  })(),
+}
 export default config;
