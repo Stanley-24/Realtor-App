@@ -7,7 +7,8 @@ import type { Request } from 'express';
 // Helper to safely get normalized IP
 const getIp = (req: Request): string => {
   
-  return req.ip ?? 'unknown-ip';
+  const ip = (req.ip || 'unknown-ip').split(':')[0];
+  return ip;
 };
 
 // Create SEPARATE stores with unique prefixes
