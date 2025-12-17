@@ -1,4 +1,5 @@
-// src/utils/emailTemplate.ts (add this function alongside generateWelcomeEmail)
+//server/src/emails/resetPassTemp.ts
+
 import config from '../config/config';
 
 export const generatePasswordResetEmail = (fullName: string, resetUrl: string) => {
