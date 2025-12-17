@@ -1,4 +1,4 @@
-// src/controllers/authController.ts
+// src/controllers/user/forget.psWrd.Controller.ts
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import User from '../../models/user.model';
