@@ -4,7 +4,7 @@ import config from '../config/config';
 
 export const generatePasswordResetEmail = (fullName: string, resetUrl: string) => {
   const APP_NAME =  config.NAME || "Rental Wave";
-  const ICON_URL = config.ICON_URL;
+  const ICON_URL = config.ICON_URL || "https://pbs.twimg.com/media/G8TuzLlWcAArhIK?format=png&name=small";
   const VITE_CLIENT_URL = config.VITE_CLIENT_URL || "https://realtor-app-mcoo.onrender.com";
   return `
     <!DOCTYPE html>
