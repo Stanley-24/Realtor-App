@@ -55,7 +55,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
   const { password, confirmPassword } = req.body;
 
   // Basic validation
-  if (!password && password.length < 8) {
+  if (!password || password.length < 8) {
     res.status(400).json({ message: 'Password must be at least 8 characters long.' });
     return;
   }
