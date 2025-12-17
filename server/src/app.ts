@@ -5,13 +5,14 @@ import authRoutes from "./routes/auth.routes";
 import propertyRoutes from "./routes/property.routes";
 import healthRoutes from "./routes/health.checker"
 import googleAuthRoutes from "./routes/googleAuth.routes";
+import lostPasswordRoutes from "./routes/lostPassword.routes";
 import path from "path";
 import cookieParser from "cookie-parser";
 
 const app = express();
 
 
-
+app.set('trust proxy', 1);
 
 app.use(
   cors({
@@ -38,6 +39,7 @@ app.use("/api/v1/auth", googleAuthRoutes);
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/properties", propertyRoutes);
+app.use("/api/v1/auth", lostPasswordRoutes);
 
 
 

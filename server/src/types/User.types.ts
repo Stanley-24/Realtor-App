@@ -16,8 +16,12 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   authProvider: 'local' | 'google';
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 
+  // Methods
   matchPassword(enteredPassword: string): Promise<boolean>;
+  generatePasswordResetToken(): string;
 }
 
 export interface IUserRegisterBody {

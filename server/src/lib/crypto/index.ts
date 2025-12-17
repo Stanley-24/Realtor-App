@@ -1,0 +1,2 @@
+
+export { generatePasswordResetToken } from './generateResetToken';
