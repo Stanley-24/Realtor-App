@@ -32,7 +32,7 @@ describe("POST /api/v1/contact - Contact Form Submission", () => {
   it("successfully saves contact message and returns 201", async () => {
     const payload = {
       fullName: "Jane Smith",
-      email: "owarieta2023@gmail.com",
+      email: "jane1234@test.com",
       message: "Hello! I'm interested in learning more about your real estate services.",
     };
 
@@ -42,23 +42,23 @@ describe("POST /api/v1/contact - Contact Form Submission", () => {
     expect(res.body.message).toBe("Thank you! Your message has been sent successfully.");
     expect(res.body.data).toMatchObject({
       fullName: "Jane Smith",
-      email: "owarieta2023@gmail.com",
+      email: "jane1234@test.com",
       message: payload.message,
     });
     expect(res.body.data._id).toBeDefined();
     expect(res.body.data.createdAt).toBeDefined();
 
     // Verify it was saved in DB
-    const savedMessage = await ContactMessage.findOne({ email: "owarieta2023@gmail.com" });
+    const savedMessage = await ContactMessage.findOne({ email: "jane1234@test.com" });
     expect(savedMessage).toBeTruthy();
     expect(savedMessage?.fullName).toBe("Jane Smith");
     expect(savedMessage?.message).toBe(payload.message);
 
     // Verify email functions were called
-    expect(sendContactConfirmationEmail).toHaveBeenCalledWith("Jane Smith", "owarieta2023@gmail.com");
+    expect(sendContactConfirmationEmail).toHaveBeenCalledWith("Jane Smith", "jane1234@test.com");
     expect(sendContactNotificationToAdmin).toHaveBeenCalledWith(
       "Jane Smith",
-      "owarieta2023@gmail.com",
+      "jane1234@test.com",
       payload.message
     );
   });
@@ -96,7 +96,7 @@ describe("POST /api/v1/contact - Contact Form Submission", () => {
 
     expect(res.status).toBe(400);
     expect(res.body.message).toBe(
-      "Message must be less than 275 characters or use the email for long messages"
+      "Message must be 275 characters or less, or use email for longer messages"
     );
   });
 
