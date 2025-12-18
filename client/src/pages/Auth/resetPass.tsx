@@ -19,6 +19,15 @@ export default function ResetPasswordPage() {
       clearMessages();
     }, [clearMessages]);
   
+
+      useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => navigate("/login"), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success, navigate]);
+  
+  
   // If no token in URL, show error
   if (!token) {
     return (
@@ -50,11 +59,6 @@ export default function ResetPasswordPage() {
 
     await resetPassword(token, password);
   };
-
-  // Auto-redirect on success (optional improvement)
-  if (success) {
-    setTimeout(() => navigate("/login"), 3000);
-  }
 
   return (
     <div className="min-h-screen bg-background-blue flex items-center justify-center p-4 relative">
