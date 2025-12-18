@@ -18,6 +18,7 @@ interface Config {
   api_secret: string;
   googleClientId: string;
   ICON_URL: string;
+  ADMIN_EMAIL: string;
   
 }
 
@@ -62,6 +63,9 @@ const config: Config = {
   })(),
   ICON_URL: process.env.ICON_URL || (() => {
     throw new Error('ICON_URL environment variable is required');
+  })(),
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL || (() => {
+    throw new Error('ADMIN_EMAIL environment variable is required');
   })(),
 }
 export default config;
