@@ -29,7 +29,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     await user.save({ validateBeforeSave: false });
 
     // Build frontend reset URL
-    const resetUrl = `${config.CLIENT_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${config.VITE_CLIENT_URL}/reset-password/${resetToken}`;
 
     // Send email using our clean service
     const emailResult = await sendPasswordResetEmailService(
