@@ -94,6 +94,7 @@ jest.mock("google-auth-library", () => {
 // import setup components for MongoDB from helper file
 
 import { startMongoMemoryReplSet, clearDatabase, stopMongoMemoryReplSet } from "./properties/helpers/setup-mongo";
+import redisClient from "../config/redis";
 
 beforeAll(async () => {
   await startMongoMemoryReplSet();
@@ -105,6 +106,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await stopMongoMemoryReplSet();
+  await redisClient.quit();
 });
 // Add shared helpers for controller tests
 export { mockRequest, mockResponse } from "./properties/helpers/controllerHelper";
