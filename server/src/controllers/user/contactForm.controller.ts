@@ -21,8 +21,8 @@ export const submitContactForm = async (req: Request<{}, {}, IContactFormBody>, 
       return;
     }
 
-    if (message.length >= 276) {
-      res.status(400).json({ message: "Message must be less than 275 characters or use the email for long messages" });
+    if (message.length > 275) {
+      res.status(400).json({ message: "Message must be 275 characters or less, or use email for longer messages" });
       return;
     }
 
