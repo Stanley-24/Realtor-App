@@ -9,6 +9,8 @@ import BuyerDashboard from './pages/Dashboard/buyer'
 import ProtectedRoute from './sharedComponents/ProtectedRoute'
 import { useAuthStore } from './store/authStore'
 import SelectRolePage from './pages/Auth/SelectRolePage'
+import ResetPasswordPage from './pages/Auth/resetPass'
+import ForgotPasswordPage from './pages/Auth/forgetPass'
 
 function App() {
   const { checkAuth } = useAuthStore();
@@ -24,6 +26,8 @@ function App() {
       <Route path='/login' element={<LoginPage />} />
       <Route path='/signup' element={<SignupPage />} />
       <Route path="/select-role" element={<SelectRolePage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
 
       <Route element={<ProtectedRoute allowedRoles={["admin"]}/> }>
