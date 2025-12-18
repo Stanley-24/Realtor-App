@@ -94,9 +94,9 @@ export default function LoginPage() {
             </button>
 
             <div className="flex flex-row justify-between items-center text-xs sm:text-sm">
-              <button type="button" className="text-white font-jetbrain font-normal hover:text-btn-colors">
+              <Link to="/forgot-password" className="text-white font-jetbrain font-normal hover:text-btn-colors">
                 Forgot Password?
-              </button>
+              </Link>
 
               <Link to="/signup" className="text-white font-jetbrain font-normal hover:text-btn-colors">
                 New here? Sign up
