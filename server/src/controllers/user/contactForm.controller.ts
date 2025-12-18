@@ -5,7 +5,11 @@ import { sendContactConfirmationEmail, sendContactNotificationToAdmin } from "..
 
 export const submitContactForm = async (req: Request<{}, {}, IContactFormBody>, res: Response): Promise<void> => {
   try {
-    const { fullName, email, message } = req.body;
+    let { fullName, email, message } = req.body;
+
+    fullName = fullName?.trim();
+    email = email?.trim().toLowerCase();
+    message = message?.trim();
 
     if (!fullName || !email || !message) {
       res.status(400).json({ message: "Please fill in all fields" });
@@ -23,11 +27,13 @@ export const submitContactForm = async (req: Request<{}, {}, IContactFormBody>, 
     }
 
     // Save to database
-    const contactMessage = await ContactMessage.create({
+    const contactMessage = new ContactMessage({
       fullName,
       email,
       message,
     });
+
+    await contactMessage.save();
 
     // Send confirmation to user (non-blocking)
     sendContactConfirmationEmail(fullName, email);
@@ -39,8 +45,21 @@ export const submitContactForm = async (req: Request<{}, {}, IContactFormBody>, 
       message: "Thank you! Your message has been sent successfully.",
       data: contactMessage,
     });
-  } catch (error) {
+  } 
+  catch (error: any) {
     console.error("Contact form submission error:", error);
+    console.error("Error name:", error.name);
+    console.error("Error message:", error.message);
+    if (error.errors) {
+      console.error("Validation errors:", Object.values(error.errors).map((e: any) => e.message));
+    }
+
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((e: any) => e.message).join("; ");
+      res.status(400).json({ message: messages || "Invalid data provided" });
+      return;
+    }
+
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
