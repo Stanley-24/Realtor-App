@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useProductStore } from "../../../store/productStore";
-import type { Property } from "../../../store/productStore";
-import PropertyCard from "../../../sharedComponents/properties/PropertyCard";
+import { useProductStore } from "@/store/productStore";
+import type { Property } from "@/store/productStore";
+import PropertyCard from "@/sharedComponents/properties/PropertyCard";
 
 // Custom hook to detect mobile screen size (safe for SSR and reactive)
 function useIsMobile() {

@@ -2,6 +2,8 @@ import { sendEmail } from "./emailHandlers";
 import { generateWelcomeEmail } from "./emailTemplate";
 import { generatePasswordResetEmail} from "./resetPassTemp"
 import { EmailResult } from "../types/email.types";
+import { generateContactReceivedEmail, generateContactAdminNotification } from "./contactEmailTemplate";
+import config from "../config/config";
 
 export async function sendWelcomeEmail(newUser: any, res: any) {
 
@@ -43,3 +45,34 @@ export const sendPasswordResetEmailService = async (
     return { success: false, error: emailError };
   }
 };
+
+
+
+
+export async function sendContactConfirmationEmail(fullName: string, email: string) {
+  try {
+    const html = generateContactReceivedEmail(fullName);
+    await sendEmail({
+      to: email,
+      subject: "We've Received Your Message – Rental Wave",
+      html,
+    });
+  } catch (error) {
+    console.error("Failed to send contact confirmation email:", error);
+  }
+}
+
+export async function sendContactNotificationToAdmin(fullName: string, email: string, message: string) {
+  try {
+    const html = generateContactAdminNotification(fullName, email, message);
+    const ADMIN_EMAIL = config.ADMIN_EMAIL || "admin@rentalwave.com"; 
+
+    await sendEmail({
+      to: ADMIN_EMAIL,
+      subject: `New support ticket open via from ${fullName}`,
+      html,
+    });
+  } catch (error) {
+    console.error("Failed to send admin notification:", error);
+  }
+}

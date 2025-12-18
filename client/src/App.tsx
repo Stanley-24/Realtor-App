@@ -1,14 +1,16 @@
 import { useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import HomePage from './pages/Home'
-import LoginPage from './pages/Auth/loginPage'
-import SignupPage from './pages/Auth/signupPage'
-import AgentDashboard from './pages/Dashboard/agent'
-import AdminDashboard from './pages/Dashboard/admin'
-import BuyerDashboard from './pages/Dashboard/buyer'
-import ProtectedRoute from './sharedComponents/ProtectedRoute'
-import { useAuthStore } from './store/authStore'
-import SelectRolePage from './pages/Auth/SelectRolePage'
+import HomePage from '@/pages/Home'
+import LoginPage from '@/pages/Auth/loginPage'
+import SignupPage from '@/pages/Auth/signupPage'
+import AgentDashboard from '@/pages/Dashboard/agent'
+import AdminDashboard from '@/pages/Dashboard/admin'
+import BuyerDashboard from '@/pages/Dashboard/buyer'
+import ProtectedRoute from '@/sharedComponents/ProtectedRoute'
+import { useAuthStore } from '@/store/authStore'
+import SelectRolePage from '@/pages/Auth/SelectRolePage'
+import ResetPasswordPage from '@/pages/Auth/resetPass'
+import ForgotPasswordPage from '@/pages/Auth/forgetPass'
 
 function App() {
   const { checkAuth } = useAuthStore();
@@ -24,6 +26,8 @@ function App() {
       <Route path='/login' element={<LoginPage />} />
       <Route path='/signup' element={<SignupPage />} />
       <Route path="/select-role" element={<SelectRolePage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
 
       <Route element={<ProtectedRoute allowedRoles={["admin"]}/> }>

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { apiConfig } from "../config";
+import { apiConfig } from "@/config";
 
 interface Agent {
   _id: string;

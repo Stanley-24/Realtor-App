@@ -1,7 +1,7 @@
-import { LogoBlack } from "../../../sharedComponents/Logo";
+import { LogoBlack } from "@/sharedComponents/Logo";
 export default function ContactForm() {
   return (
-    <div id="contact" className="bg-black/85 text0-white py-12 px-6 md:px-14 flex flex-col md:flex-row items-center md:items-center justify-center md:justify-between gap-8">
+    <div id="contact" className="bg-black/85 text-white py-12 px-6 md:px-14 flex flex-col md:flex-row items-center md:items-center justify-center md:justify-between gap-8">
       <div className="md:w-1/3 w-full flex flex-col items-center md:items-start text-center md:text-left">
         <h3 className="font-bold mb-2 font-head text-gray-300 text-xl">Send Us Message</h3>
         <p className="text-sm font-jetbrain text-gray-300 mb-4">
