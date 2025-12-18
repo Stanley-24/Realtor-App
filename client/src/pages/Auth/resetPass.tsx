@@ -27,7 +27,7 @@ export default function ResetPasswordPage() {
     }
   }, [success, navigate]);
   
-  
+
   // If no token in URL, show error
   if (!token) {
     return (
@@ -115,6 +115,7 @@ export default function ResetPasswordPage() {
                 <p className="text-green-400 text-base font-semibold">{success}</p>
                 <p className="text-gray-300 text-sm">Redirecting to login in 3 seconds...</p>
                 <button
+                type="button"
                   onClick={() => navigate("/login")}
                   className="w-full bg-pinky hover:bg-blue-gradient transition font-bold font-nunito text-white py-3 rounded-full"
                 >
