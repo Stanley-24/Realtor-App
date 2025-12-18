@@ -69,7 +69,7 @@ export async function sendContactNotificationToAdmin(fullName: string, email: st
 
     await sendEmail({
       to: ADMIN_EMAIL,
-      subject: `New support ticket open via from ${fullName}`,
+      subject: `New support ticket opened by ${fullName}`,
       html,
     });
   } catch (error) {
