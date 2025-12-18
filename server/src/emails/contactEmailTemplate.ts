@@ -1,10 +1,23 @@
 import config from '../config/config';
 
+const escapeHtml = (text: string): string => {
+    const map: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, (char) => map[char]);
+  };
+
+
 export const generateContactReceivedEmail = (fullName: string) => {
   const APP_NAME = config.NAME || "Rental Wave";
   const ICON_URL = config.ICON_URL || "https://pbs.twimg.com/media/G8TuzLlWcAArhIK?format=png&name=small";
   const VITE_CLIENT_URL = config.VITE_CLIENT_URL || "https://realtor-app-mcoo.onrender.com";
 
+  
   return `
     <!DOCTYPE html>
       <html lang="en">
@@ -23,7 +36,7 @@ export const generateContactReceivedEmail = (fullName: string) => {
 
           <!-- Body -->
           <div style="padding: 30px; color: #333;">
-            <p style="font-size: 18px; font-weight: bold;">Hi ${fullName},</p>
+            <p style="font-size: 18px; font-weight: bold;">Hi ${escapeHtml(fullName)},</p>
             
             <p style="font-size: 16px; line-height: 1.6;">
               Thank you for reaching out to <strong>${APP_NAME}</strong>! We've received your message and appreciate you taking the time to contact us.
@@ -92,10 +105,10 @@ export const generateContactAdminNotification = (fullName: string, email: string
       <body style="font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4;">
         <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px;">
           <h2>Contact form Ticket</h2>
-          <p><strong>Ticket sender:</strong> ${fullName} (${email})</p>
+          <p><strong>Ticket sender:</strong> ${escapeHtml(fullName)} (${escapeHtml(email)})</p>
           <p><strong>Message Details:</strong></p>
           <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #ba3fc0; margin: 20px 0;">
-            ${message.replace(/\n/g, '<br/>')}
+            ${escapeHtml(message).replace(/\n/g, '<br/>')}
           </div>
           <p><em>This Ticket was submitted via the contact form on ${APP_NAME} website.</em></p>
         </div>
