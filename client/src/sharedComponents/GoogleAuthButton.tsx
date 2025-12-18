@@ -1,8 +1,8 @@
 import { useCallback, useRef } from "react";
-import { useGoogleAuthStore } from "../store/googleAuthStore";
+import { useGoogleAuthStore } from "@/store/googleAuthStore";
 import { useNavigate } from "react-router-dom";
-import { useGoogleOAuth } from "../hooks/useGoogleOAuth";
-import type { GoogleAuthResponse } from "../lib/googleOAuth.utils";
+import { useGoogleOAuth } from "@/hooks/useGoogleOAuth";
+import type { GoogleAuthResponse } from "@/lib/googleOAuth.utils";
 
 export default function GoogleAuthButton() {
   const { googleLogin, loading } = useGoogleAuthStore();

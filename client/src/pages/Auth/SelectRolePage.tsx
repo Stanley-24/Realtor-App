@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGoogleAuthStore } from "../../store/googleAuthStore";
+import { useGoogleAuthStore } from "@/store/googleAuthStore";
 
 export default function SelectRolePage() {
   const navigate = useNavigate();

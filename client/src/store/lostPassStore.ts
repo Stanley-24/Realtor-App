@@ -1,6 +1,6 @@
 // src/store/lostPassStore.ts
 import { create } from "zustand";
-import { apiConfig } from "../config";
+import { apiConfig } from "@/config";
 
 interface PasswordResetState {
   loading: boolean;

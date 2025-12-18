@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, Link, Navigate } from "react-router-dom";
-import { useAuthStore } from "../../store/authStore";
-import { getDashboardUrl } from "../../lib/utils";
-import img1 from "../../assets/images/images4.jpeg";
+import { useAuthStore } from "@/store/authStore";
+import { getDashboardUrl } from "@/lib/utils";
+import img1 from "@/assets/images/images4.jpeg";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import GoogleAuthButton from "../../sharedComponents/GoogleAuthButton";
+import GoogleAuthButton from "@/sharedComponents/GoogleAuthButton";
 
 export default function LoginPage() {
   const { login, loading, error, user, initializing } = useAuthStore();

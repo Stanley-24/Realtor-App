@@ -2,9 +2,9 @@
 
 import { useState, type FormEvent, useEffect } from "react"; // ← Add useEffect
 import { Link, useNavigate } from "react-router-dom";
-import { usePasswordResetStore } from "../../store/lostPassStore";
+import { usePasswordResetStore } from "@/store/lostPassStore";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { apiConfig } from "../../config";
+import { apiConfig } from "@/config";
 
 const ICON_URL = apiConfig.ICON_URL || "";
 
