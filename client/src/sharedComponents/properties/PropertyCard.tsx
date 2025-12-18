@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Property } from "../../store/productStore";
+import type { Property } from "@/store/productStore";
 
 export default function PropertyCard({ p }: { p: Property }) {
   const [currentIndex, setCurrentIndex] = useState(0);

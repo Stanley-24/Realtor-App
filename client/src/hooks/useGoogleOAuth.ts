@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { apiConfig } from "../config";
-import type { GoogleAuthResponse } from "../lib/googleOAuth.utils";
+import { apiConfig } from "@/config";
+import type { GoogleAuthResponse } from "@/lib/googleOAuth.utils";
 
 
 /**

@@ -1,4 +1,4 @@
-import img1 from "../../../assets/images/owner2.jpg";
+import img1 from "@/assets/images/owner2.jpg";
 import { Link } from "react-router-dom";
 
 export default function About() {

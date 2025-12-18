@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import { apiConfig } from "../config";
+import { apiConfig } from "@/config";
 import {
   syncGoogleUserToAuthStore,
-} from "../lib/googleOAuth.utils";
+} from "@/lib/googleOAuth.utils";
 
 interface PendingGoogleUser {
   fullName: string;
