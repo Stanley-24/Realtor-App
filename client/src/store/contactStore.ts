@@ -72,7 +72,8 @@ export const useContactStore = create<ContactFormState>((set, get) => ({
         });
         set({ status: 'error' });
       }
-    } catch {
+    } catch (error) {
+      console.error('Contact form submission failed:', error);
       toast.error('Network error. Please check your connection and try again.', {
         style: {
           background: "red",
@@ -93,3 +94,5 @@ export const useContactStore = create<ContactFormState>((set, get) => ({
     });
   },
 }));
+
+
