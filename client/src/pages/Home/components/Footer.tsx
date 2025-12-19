@@ -1,4 +1,6 @@
-// ContactForm.tsx
+// client/src/pages/Home/components/Footer.tsx
+
+
 import { LogoBlack } from "@/sharedComponents/Logo";
 import { useContactStore } from "@/store/contactStore";
 
