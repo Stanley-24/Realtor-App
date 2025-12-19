@@ -30,16 +30,10 @@ export const contactFormLimiter = rateLimit({
     message: 'Too many form submissions. Please try again in an hour or write us via email.',
   },
 
-  // Custom key: prioritize email (from body), fallback to IP
   keyGenerator: (req: Request): string => {
-    if (req.body?.email && typeof req.body.email === 'string') {
-      const email = req.body.email.toLowerCase().trim();
-      if (email) return `email:${email}`;
-    }
-    // Fallback to IP
     return `ip:${getIp(req)}`;
   },
-
+  
   // Custom handler for consistent response format
   handler: (_, res) => {
     res.status(429).json({
